@@ -180,7 +180,7 @@ model:add(nn.SoftMax())
 -- criterion = nn.ClassNLLCriterion()
 
 --------------------------------- MODEL AND CRITERION -----------------------------------
-optimState = {learningRate = 1e-3, weightDecay = 0, momentum = 0,learningRateDecay = 1e-7}
+optimState = {learningRate = 1e-3, weightDecay = 0, momentum = 0,learningRateDecay = 0.998}
 optimMethod = optim.sgd
 batchSize = 128 --  set that to whatever we want
 
@@ -205,26 +205,26 @@ function train()
       end
 
       local feval = function(x) -- create closure to evaluate f(X) and df/dX
-      	-- get new parameters
-		if x ~= parameters then
-			parameters:copy(x)
-		end
-		gradParameters:zero() -- reset gradients
-		local f = 0 -- f is the average of all criterions
+         	-- get new parameters
+   		if x ~= parameters then
+   			parameters:copy(x)
+   		end
+   		gradParameters:zero() -- reset gradients
+   		local f = 0 -- f is the average of all criterions
 
-		for i = 1,#inputs do -- evaluate function for complete mini batch                          
-			local output = model:forward(inputs[i])
-			local err = criterion:forward(output, targets[i])
-			f = f + err
+   		for i = 1,#inputs do -- evaluate function for complete mini batch                          
+   			local output = model:forward(inputs[i])
+   			local err = criterion:forward(output, targets[i])
+   			f = f + err
 
-			local df_do = criterion:backward(output, targets[i])
-			model:backward(inputs[i], df_do)
-			confusion:add(output, targets[i]) -- update confusion
-		end
-		gradParameters:div(#inputs) -- normalize gradients and f(X)
-		f = f/#inputs
-		return f,gradParameters -- return f and df/dX
-	  end
+   			local df_do = criterion:backward(output, targets[i])
+   			model:backward(inputs[i], df_do)
+   			confusion:add(output, targets[i]) -- update confusion
+   		end
+   		gradParameters:div(#inputs) -- normalize gradients and f(X)
+   		f = f/#inputs
+   		return f,gradParameters -- return f and df/dX
+      end
       optimMethod(feval, parameters, optimState)
       
    end
