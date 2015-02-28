@@ -21,9 +21,9 @@ imageWidth    = 96
 outputClasses = 10
 
 ------------------------------------- READ DATA ----------------------------------------
-trainFile = 'trainA2Matlab'
-testFile  = 'testA2Matlab'
-extraFile = 'unlabeledA2Matlab'
+trainFile = 'trainA2Matlab.mat'
+testFile  = 'testA2Matlab.mat'
+extraFile = 'unlabeledA2Matlab.mat'
 loadedTrain = mattorch.load(trainFile)
 loadedTest = mattorch.load(testFile)
 --loadedUnlabeled = mattorch.load(extraFile)
