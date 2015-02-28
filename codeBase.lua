@@ -9,9 +9,28 @@ require 'optim'   -- an optimization package, for online and batch methods
 torch.setnumthreads( 8 )
 torch.manualSeed(1) -- this was the default
 
----------------------------------------- READ DATA ------------------------------
+------------------------------------ PARAMETERS ----------------------------------------
+trainSize     = 500
+trainSize     = 800
+extraSize     = 100000
+imageHeight   = 96
+imageWidth    = 96
+outputClasses = 10
 
---------------------------------------- END READ DATA ------------------------------
+------------------------------------- READ DATA ----------------------------------------
+trainFile = 'tr_bin.dat'
+testFile  = 'ts_bin.dat'
+extraFile = 'un_bin.dat'
+trainingSet = torch.load( trainFile )
+testSet = torch.load( trainFile )
+-- extraSet = torch.load( trainFile )
+------------------------------- CREATE SURROGATE CLASS ---------------------------------
+
+
+------------------------------------ DATA AUGMENTATIONS --------------------------------
+
+
+--------------------------------------- END READ DATA ----------------------------------
 
 ------------------------------------ THIS WILL CHANGE ----------------------------------
 print '==> define parameters'
