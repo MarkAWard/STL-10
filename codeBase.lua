@@ -149,24 +149,36 @@ normkernel = image.gaussian1D(7)
 --------------------------------- END THIS WILL CHANGE ----------------------------------
 
 --------------------------------- MODEL AND CRITERION -----------------------------------
- model = nn.Sequential()
--- stage 1 : filter bank -> squashing -> L2 pooling -> normalization
-model:add(nn.SpatialConvolutionMM(nfeats, nstates[1], filtsize, filtsize))
-model:add(nn.Tanh())
-model:add(nn.SpatialLPPooling(nstates[1],2,poolsize,poolsize,poolsize,poolsize))
-model:add(nn.SpatialSubtractiveNormalization(nstates[1], normkernel))
--- stage 2 : filter bank -> squashing -> L2 pooling -> normalization
-model:add(nn.SpatialConvolutionMM(nstates[1], nstates[2], filtsize, filtsize))
-model:add(nn.Tanh())
-model:add(nn.SpatialLPPooling(nstates[2],2,poolsize,poolsize,poolsize,poolsize))
-model:add(nn.SpatialSubtractiveNormalization(nstates[2], normkernel))
--- stage 3 : standard 2-layer neural network
-model:add(nn.Reshape(nstates[2]*filtsize*filtsize))
-model:add(nn.Linear(nstates[2]*filtsize*filtsize, nstates[3]))
-model:add(nn.Tanh())
-model:add(nn.Linear(nstates[3], noutputs))
-model:add(nn.LogSoftMax())
-criterion = nn.ClassNLLCriterion()
+model = nn.Sequential()
+
+model:add(nn.SpatialZeroPadding(2,2,2,2))
+model:add(nn.SpatialConvolution(3, 23, 7, 7, 2, 2))
+model:add(nn.ReLU())
+model:add(nn.SpatialMaxPooling(3,3,2,2))
+model:add(nn.Dropout(.5))
+model:add(nn.Reshape(23*23*23))
+model:add(nn.Linear(23*23*23, 50))
+model:add(nn.Linear(50,10))
+model:add(nn.SoftMax())
+
+-- -- stage 1 : filter bank -> squashing -> L2 pooling -> normalization
+-- model:add(nn.SpatialConvolutionMM(nfeats, nstates[1], filtsize, filtsize))
+-- model:add(nn.Tanh())
+-- model:add(nn.SpatialLPPooling(nstates[1],2,poolsize,poolsize,poolsize,poolsize))
+-- model:add(nn.SpatialSubtractiveNormalization(nstates[1], normkernel))
+-- -- stage 2 : filter bank -> squashing -> L2 pooling -> normalization
+-- model:add(nn.SpatialConvolutionMM(nstates[1], nstates[2], filtsize, filtsize))
+-- model:add(nn.Tanh())
+-- model:add(nn.SpatialLPPooling(nstates[2],2,poolsize,poolsize,poolsize,poolsize))
+-- model:add(nn.SpatialSubtractiveNormalization(nstates[2], normkernel))
+-- -- stage 3 : standard 2-layer neural network
+-- model:add(nn.Reshape(nstates[2]*filtsize*filtsize))
+-- model:add(nn.Linear(nstates[2]*filtsize*filtsize, nstates[3]))
+-- model:add(nn.Tanh())
+-- model:add(nn.Linear(nstates[3], noutputs))
+-- model:add(nn.LogSoftMax())
+-- criterion = nn.ClassNLLCriterion()
+
 --------------------------------- MODEL AND CRITERION -----------------------------------
 optimState = {learningRate = 1e-3, weightDecay = 0, momentum = 0,learningRateDecay = 1e-7}
 optimMethod = optim.sgd
