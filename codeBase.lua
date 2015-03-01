@@ -13,7 +13,7 @@ torch.manualSeed(1) -- this was the default
 ------------------------------------ PARAMETERS ----------------------------------------
 trainSize     = 4500
 valSize       = 500
-testSize     = 800
+testSize     = 8000
 extraSize     = 100000
 channels	  = 3
 imageHeight   = 96
@@ -21,13 +21,19 @@ imageWidth    = 96
 outputClasses = 10
 
 ------------------------------------- READ DATA ----------------------------------------
-trainFile = 'trainA2Matlab.mat'
-testFile  = 'testA2Matlab.mat'
-extraFile = 'unlabeledA2Matlab.mat'
+
+trainFile = '/scratch/courses/DSGA1008/A2/matlab/train.mat'
+testFile = '/scratch/courses/DSGA1008/A2/matlab/test.mat'
+extraFile = '/scratch/courses/DSGA1008/A2/matlab/unlabeled.mat'
+
+--trainFile = 'trainA2Matlab.mat'
+--testFile  = 'testA2Matlab.mat'
+--extraFile = 'unlabeledA2Matlab.mat'
+
 loadedTrain = mattorch.load(trainFile)
 loadedTest = mattorch.load(testFile)
 --loadedUnlabeled = mattorch.load(extraFile)
-allTrainData   = loadedTrain.X:t():reshape(trainSize, channels, imageHeight, imageWidth)
+allTrainData   = loadedTrain.X:t():reshape(trainSize + valSize, channels, imageHeight, imageWidth)
 allTrainLabels = loadedTrain.y[1]
 
 -- we are going to use the first 4500 indexes of the shuffleIndices as the train set
@@ -60,7 +66,7 @@ valData = {
    size = function() return valSize end
 }
 testData = {
-   data   = loadedTest.X:t():reshape(testSize, channels, imageHeight, imageWidth)
+   data   = loadedTest.X:t():reshape(testSize, channels, imageHeight, imageWidth),
    labels = loadedTest.y[1],
    size = function() return testSize end
 }
@@ -252,3 +258,8 @@ function val()
 end
 --------------------------------- END VAL FUNCTION --------------------------------
 
+
+for i = 1, 2 do
+    train()
+    test()
+end
