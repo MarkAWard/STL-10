@@ -7,18 +7,37 @@ require 'mattorch'
 -- The type is by default 'double' so I leave it like this now as we never changed it before
 -- When using CUDA
 --  changes:  require 'cunn', the model, the criterion, input = input:cuda()
-torch.setnumthreads( 8 )
-torch.manualSeed(1) -- this was the default
 
 ------------------------------------ PARAMETERS ----------------------------------------
+cmd = torch.CmdLine()
+cmd:text()
+cmd:text('Options:')
+cmd:option('-seed', 1, 'fixed input seed for repeatable experiments')
+cmd:option('-threads', 8, 'number of threads')
+cmd:option('-type', 'double', 'type: double | float | cuda')
+cmd:text()
+opt = cmd:parse(arg or {})
+
 trainSize     = 4500
 valSize       = 500
-testSize     = 8000
+testSize      = 8000
 extraSize     = 100000
-channels	  = 3
+channels	     = 3
 imageHeight   = 96
 imageWidth    = 96
 outputClasses = 10
+
+torch.setnumthreads( opt.threads )
+torch.manualSeed( opt.seed )
+
+if opt.type == 'float' then
+   print('==> switching to floats')
+   torch.setdefaulttensortype('torch.FloatTensor')
+elseif opt.type == 'cuda' then
+   print('==> switching to CUDA')
+   require 'cunn'
+   torch.setdefaulttensortype('torch.FloatTensor')
+end 
 
 ------------------------------------- READ DATA ----------------------------------------
 
@@ -135,17 +154,40 @@ end
 ------------------------------------ DATA AUGMENTATIONS --------------------------------
 
 --------------------------------- MODEL AND CRITERION -----------------------------------
-model = nn.Sequential()
+if opt.type == 'cuda' then
+      
+   model = nn.Sequential()
+   model:add(nn.SpatialZeroPadding(2,2,2,2))
+   model:add(nn.SpatialConvolutionMM(3, 23, 7, 7, 2, 2))
+   model:add(nn.ReLU())
+   model:add(nn.SpatialMaxPooling(3,3,2,2))
+   model:add(nn.Dropout(.5))
+   model:add(nn.View(23*23*23))
+   model:add(nn.Linear(23*23*23, 50))
+   model:add(nn.Linear(50,10))
+   model:add(nn.LogSoftMax()())
 
-model:add(nn.SpatialZeroPadding(2,2,2,2))
-model:add(nn.SpatialConvolution(3, 23, 7, 7, 2, 2))
-model:add(nn.ReLU())
-model:add(nn.SpatialMaxPooling(3,3,2,2))
-model:add(nn.Dropout(.5))
-model:add(nn.Reshape(23*23*23))
-model:add(nn.Linear(23*23*23, 50))
-model:add(nn.Linear(50,10))
-model:add(nn.SoftMax())
+else
+   
+   model = nn.Sequential()
+   model:add(nn.SpatialZeroPadding(2,2,2,2))
+   model:add(nn.SpatialConvolution(3, 23, 7, 7, 2, 2))
+   model:add(nn.ReLU())
+   model:add(nn.SpatialMaxPooling(3,3,2,2))
+   model:add(nn.Dropout(.5))
+   model:add(nn.Reshape(23*23*23))
+   model:add(nn.Linear(23*23*23, 50))
+   model:add(nn.Linear(50,10))
+   model:add(nn.LogSoftMax()())
+
+end
+
+criterion = nn.ClassNLLCriterion()
+
+if opt.type == 'cuda' then
+   model:cuda()
+   criterion:cuda()
+end
 
 optimState = {learningRate = 1e-3, weightDecay = 0, momentum = 0,learningRateDecay = 0.998}
 optimMethod = optim.sgd
@@ -166,7 +208,8 @@ function train( epoch )
          -- load new sample
          local input = trainData.data[shuffle[i]]
          local target = trainData.labels[shuffle[i]]
-         input = input:double()         
+         if opt.type == 'double' then input = input:double()
+         elseif opt.type == 'cuda' then input = input:cuda() end
          table.insert(inputs, input)
          table.insert(targets, target)
       end
@@ -209,7 +252,8 @@ function val()
    model:evaluate()
    for t = 1,valData:size() do
       local input = valData.data[t]
-      input = input:double()
+      if opt.type == 'double' then input = input:double()
+      elseif opt.type == 'cuda' then input = input:cuda() end
       local target = valData.labels[t]
       local pred = model:forward(input)
       confusion:add(pred, target)
@@ -222,7 +266,7 @@ end
 logger = optim.Logger(paths.concat('results', 'accuracyResults.log'))
 logger:add{"EPOCH  TRAIN ACC  VAL ACC"}
 for i =1, 30 do 
-	trainAcc = train()
+	trainAcc = train(i)
 	valAcc   = val()
-	logger:add{i .. "  " .. trainAcc .. "  " ..  valAcc}
+	logger:add{i .. "," .. trainAcc .. "," ..  valAcc}
 end
