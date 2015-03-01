@@ -3,7 +3,8 @@
 #PBS -l walltime=10:00:00
 #PBS -l mem=24GB
 #PBS -N LEM
-#PBS -M maw627@nyu.edu
+#PBS -M $USER@nyu.edu
+#PBS -j oe
 
 echo "job starting on `date`"
 echo
