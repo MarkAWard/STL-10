@@ -151,16 +151,6 @@ optimState = {learningRate = 1e-3, weightDecay = 0, momentum = 0,learningRateDec
 optimMethod = optim.sgd
 batchSize = 128 --  set that to whatever we want
 
-
-------------------------------- MAIN LEARNING FUNCTION ---------------------------------
-logger = optim.Logger(paths.concat('results', 'accuracyResults.log'))
-logger:add{"EPOCH  TRAIN ACC  VAL ACC"}
-for i =1, 30 do 
-	trainAcc = train()
-	valAcc   = val()
-	trainLogger:add{i .. "  " .. trainAcc "  " ..  valAcc}
-end
-
 ----------------------------------- TRAIN FUNCTION --------------------------------------
 function train( epoch )
 	classes = {'1','2','3','4','5','6','7','8','9','0'}
@@ -228,8 +218,11 @@ function val()
 end
 --------------------------------- END VAL FUNCTION --------------------------------
 
-
-for i = 1, 2 do
-    train()
-    test()
+------------------------------- MAIN LEARNING FUNCTION ---------------------------------
+logger = optim.Logger(paths.concat('results', 'accuracyResults.log'))
+logger:add{"EPOCH  TRAIN ACC  VAL ACC"}
+for i =1, 30 do 
+	trainAcc = train()
+	valAcc   = val()
+	trainLogger:add{i .. "  " .. trainAcc "  " ..  valAcc}
 end
