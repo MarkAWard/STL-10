@@ -224,5 +224,5 @@ logger:add{"EPOCH  TRAIN ACC  VAL ACC"}
 for i =1, 30 do 
 	trainAcc = train()
 	valAcc   = val()
-	trainLogger:add{i .. "  " .. trainAcc "  " ..  valAcc}
+	logger:add{i .. "  " .. trainAcc .. "  " ..  valAcc}
 end
