@@ -22,13 +22,11 @@ echo "setting up files and directories..."
 echo
 RUNDIR=$SCRATCH/logs/A2-${PBS_JOBID/.*}
 mkdir -p $RUNDIR
-cp $HOME/DeepLearning/STL-10/codeBase.lua $RUNDIR
 cd $RUNDIR
-
 
 echo "running the file..."
 echo
-th codeBase.lua
+th $SCRATCH/DeepLearning/STL-10/codeBase.lua
 
 echo "Done"
  
