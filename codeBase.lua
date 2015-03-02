@@ -195,6 +195,10 @@ if opt.type == 'cuda' then
    criterion:cuda()
 end
 
+if model then
+   parameters,gradParameters = model:getParameters()
+end
+
 ----------------------------------- OPTIMIZATION --------------------------------------
 
 optimState = {
