@@ -239,8 +239,14 @@ function train( epoch )
    		gradParameters:zero() -- reset gradients
    		local f = 0 -- f is the average of all criterions
 
+
    		for i = 1,#inputs do -- evaluate function for complete mini batch                          
    			local output = model:forward(inputs[i])
+            --- debug ---
+            print(#(inputs[i]))
+            print(#(targets[i]))
+            print(#(output))
+            -------------
    			local err = criterion:forward(output, targets[i])
    			f = f + err
 
