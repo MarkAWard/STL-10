@@ -171,7 +171,7 @@ if opt.type == 'cuda' then
    model:add(nn.View(23*23*23))
    model:add(nn.Linear(23*23*23, 50))
    model:add(nn.Linear(50,10))
-   model:add(nn.LogSoftMax()())
+   model:add(nn.LogSoftMax())
 
 else
    
@@ -184,7 +184,7 @@ else
    model:add(nn.Reshape(23*23*23))
    model:add(nn.Linear(23*23*23, 50))
    model:add(nn.Linear(50,10))
-   model:add(nn.LogSoftMax()())
+   model:add(nn.LogSoftMax())
 
 end
 

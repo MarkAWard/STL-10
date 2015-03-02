@@ -6,6 +6,8 @@
 #PBS -M $USER@nyu.edu
 #PBS -j oe
 
+cd $HOME/DeepLearning/STL-10
+
 echo "job starting on `date`"
 echo
 
@@ -18,15 +20,17 @@ echo
 module load cuda/6.5.12
 module load torch
 
-#echo "setting up files and directories..."
-#echo
-#RUNDIR=$SCRATCH/logs/A2-${PBS_JOBID/.*}
-#mkdir -p $RUNDIR
-#cd $RUNDIR
+
+RUNDIR=$SCRATCH/logs/A2-${PBS_JOBID/.*}
+mkdir -p $RUNDIR
+ 
+cd $RUNDIR
+
+cp $SCRATCH/DeepLearning/STL-10/* .
 
 echo "running the file..."
 echo
-th $HOME/DeepLearning/STL-10/codeBase.lua -type cuda
+/scratch/courses/DSGA1008/bin/./th codeBase.lua -epochs 10 -type double
 
 echo "Done"
  
