@@ -212,7 +212,7 @@ function train( epoch )
 	confusion = optim.ConfusionMatrix(classes)
 
    model:training()    -- set model to training mode (for modules that differ in training and testing, like Dropout)
-   shuffle = torch.randperm(trsize)   -- shuffle at each epoch
+   shuffle = torch.randperm(trainData:size())   -- shuffle at each epoch
    for t = 1,trainData:size(), opt.batchSize do
       -- create mini batch
       local inputs = {}
