@@ -15,6 +15,12 @@ cmd:text('Options:')
 cmd:option('-seed', 1, 'fixed input seed for repeatable experiments')
 cmd:option('-threads', 8, 'number of threads')
 cmd:option('-type', 'double', 'type: double | float | cuda')
+cmd:option('-batchSize', 32, 'mini-batch size (1 = pure stochastic)')
+cmd:option('-learningRate', 1e-3, 'learning rate at t=0')
+cmd:option('-lrDecay', 1e-7, 'learning rate at t=0')
+cmd:option('-weightDecay', 0, 'weight decay (SGD only)')
+cmd:option('-momentum', 0, 'momentum (SGD only)')
+cmd:option('-epochs', 100, 'max number of epochs to run')
 cmd:text()
 opt = cmd:parse(arg or {})
 
@@ -22,7 +28,7 @@ trainSize     = 4500
 valSize       = 500
 testSize      = 8000
 extraSize     = 100000
-channels	     = 3
+channels      = 3
 imageHeight   = 96
 imageWidth    = 96
 outputClasses = 10
@@ -189,22 +195,29 @@ if opt.type == 'cuda' then
    criterion:cuda()
 end
 
-optimState = {learningRate = 1e-3, weightDecay = 0, momentum = 0,learningRateDecay = 0.998}
+----------------------------------- OPTIMIZATION --------------------------------------
+
+optimState = {
+   learningRate = opt.learningRate,
+   weightDecay = opt.weightDecay,
+   momentum = opt.momentum,
+   learningRateDecay = opt.lrDecay
+}
 optimMethod = optim.sgd
-batchSize = 128 --  set that to whatever we want
 
 ----------------------------------- TRAIN FUNCTION --------------------------------------
+
 function train( epoch )
 	classes = {'1','2','3','4','5','6','7','8','9','0'}
 	confusion = optim.ConfusionMatrix(classes)
 
    model:training()    -- set model to training mode (for modules that differ in training and testing, like Dropout)
    shuffle = torch.randperm(trsize)   -- shuffle at each epoch
-   for t = 1,trainData:size(), batchSize do
+   for t = 1,trainData:size(), opt.batchSize do
       -- create mini batch
       local inputs = {}
       local targets = {}
-      for i = t,math.min(t+batchSize-1,trainData:size()) do
+      for i = t,math.min(t+opt.batchSize-1,trainData:size()) do
          -- load new sample
          local input = trainData.data[shuffle[i]]
          local target = trainData.labels[shuffle[i]]
@@ -265,7 +278,7 @@ end
 ------------------------------- MAIN LEARNING FUNCTION ---------------------------------
 logger = optim.Logger(paths.concat('results', 'accuracyResults.log'))
 logger:add{"EPOCH  TRAIN ACC  VAL ACC"}
-for i =1, 30 do 
+for i =1, opt.epochs do 
 	trainAcc = train(i)
 	valAcc   = val()
 	logger:add{i .. "," .. trainAcc .. "," ..  valAcc}
