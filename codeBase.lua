@@ -176,13 +176,13 @@ if opt.type == 'cuda' then
 else
    
    model = nn.Sequential()
-   model:add(nn.SpatialZeroPadding(2,2,2,2))
+--   model:add(nn.SpatialZeroPadding(2,2,2,2))
    model:add(nn.SpatialConvolution(3, 23, 7, 7, 2, 2))
    model:add(nn.ReLU())
    model:add(nn.SpatialMaxPooling(3,3,2,2))
    model:add(nn.Dropout(.5))
-   model:add(nn.Reshape(23*23*23))
-   model:add(nn.Linear(23*23*23, 50))
+   model:add(nn.Reshape(23*22*22))
+   model:add(nn.Linear(23*22*22, 50))
    model:add(nn.Linear(50,10))
    model:add(nn.LogSoftMax())
 
@@ -242,11 +242,6 @@ function train( epoch )
 
    		for i = 1,#inputs do -- evaluate function for complete mini batch                          
    			local output = model:forward(inputs[i])
-            --- debug ---
-            print(#(inputs[i]))
-            print(#(targets[i]))
-            print(#(output))
-            -------------
    			local err = criterion:forward(output, targets[i])
    			f = f + err
 
@@ -264,6 +259,7 @@ function train( epoch )
    local filename = paths.concat('results', 'model_' .. epoch .. '.net')
    os.execute('mkdir -p ' .. sys.dirname(filename))
    torch.save(filename, model)
+   print(confusion)
    return confusion.totalValid*100
 end
 --------------------------------- END TRAIN FUNCTION --------------------------------
@@ -281,6 +277,7 @@ function val()
       local pred = model:forward(input)
       confusion:add(pred, target)
    end
+   print(confusion)
    return confusion.totalValid * 100
 end
 --------------------------------- END VAL FUNCTION --------------------------------
@@ -288,7 +285,8 @@ end
 ------------------------------- MAIN LEARNING FUNCTION ---------------------------------
 logger = optim.Logger(paths.concat('results', 'accuracyResults.log'))
 logger:add{"EPOCH  TRAIN ACC  VAL ACC"}
-for i =1, opt.epochs do 
+for i =1, opt.epochs do
+      	print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> EPOCH " .. i .. " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<") 
 	trainAcc = train(i)
 	valAcc   = val()
 	logger:add{i .. "," .. trainAcc .. "," ..  valAcc}
