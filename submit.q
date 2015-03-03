@@ -1,5 +1,5 @@
 #!/bin/bash
-#PBS -l nodes=1:ppn=1:gpus=1:titan
+#PBS -l nodes=1:ppn=1
 #PBS -l walltime=10:00:00
 #PBS -l mem=24GB
 #PBS -N LEM
@@ -30,7 +30,7 @@ cp $SCRATCH/DeepLearning/STL-10/* .
 
 echo "running the file..."
 echo
-/scratch/courses/DSGA1008/bin/./th codeBase.lua -epochs 10 -type double
+/scratch/courses/DSGA1008/bin/./th codeBase.lua -epochs 1000 -type double -batchSize 8
 
 echo "Done"
  
