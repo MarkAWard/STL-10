@@ -10,4 +10,4 @@ Tasks (without priority)
 
 4) augment the training
 
-5) 
+5) make the network parallel like in '98 piece
