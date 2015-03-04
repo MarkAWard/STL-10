@@ -153,11 +153,42 @@ for i,channel in ipairs(channelsYUV) do
    print('test data, '..channel..'-channel, standard deviation: ' .. testData.data[{ {},i }]:std())
 end
 
+function crop(src, x, y, len)
+    return image.crop(src, x, y, x+len, y+len)
+end
 
 ------------------------------- CREATE SURROGATE CLASS ---------------------------------
 
+-- the new dataset is going to have dimensions C x N x (3x32x32)
+-- C is the number of the initial images we selected that we will examine.
+-- N is the number of 32x32 patches we will extract from each image
+-- 3x32x32 is the effective part of the image we will perform augmentations on.
+C = math.random( valData:size()/2, valData:size() )
+N = math.random(50, 320) -- number of patches we are going to extract from an image
+surrogateData   = torch.zeros( C*N, 3, 32, 32)
+surrogateLabels = torch.zeros( C*N )
+-- THE NUMBERS HAVE TO CHANGE, THEY WILL BE HUGE FOR THE UNLABELED DATASET
 
------------------------------------- DATA AUGMENTATIONS --------------------------------
+-- creating the labels: the first N entries have value 1, the second N ones 2 and so forth 
+for i =1, C do
+	for j=1,N do
+		surrogateLabels[ ((i-1)* N) + j ] =i -- the N patches come from the same surrogate class so we assign the same number to them
+	end
+end
+
+-- drawing the indexes of a random samples from the initial unlabeled data
+randomImageIndices = torch.randperm(valData:size())[ {{1,C}} ]
+sizeOfPatches = 32
+for i, imageIndex in pairs(randomImageIndices:totable()) do
+	for j = 1, N do
+		randX = math.random( imageHeight - sizeOfPatches )
+		randY = math.random( imageWidth - sizeOfPatches )
+		surrogateData[ (i-1)*N + j ] = crop( valData.data[imageIndex], randX, randY, 32)
+	end
+end
+
+-- when you copy paste in interactive mode in torch you can't copy-paste double for loops, so you have to do it like that in a single line
+--for i, imageIndex in pairs(randomImageIndices:totable()) do for j = 1, N do randX = math.random( imageHeight - sizeOfPatches ) randY = math.random( imageWidth - sizeOfPatches ) surrogateData[ (i-1)*N + j ] = crop( valData.data[imageIndex], randX, randY, 32) end end
 
 --------------------------------- MODEL AND CRITERION -----------------------------------
 if opt.type == 'cuda' then
@@ -283,7 +314,7 @@ end
 --------------------------------- END VAL FUNCTION --------------------------------
 
 ------------------------------- MAIN LEARNING FUNCTION ---------------------------------
-logger = optim.Logger(paths.concat('results', 'accuracyResults.log'))
+--[[logger = optim.Logger(paths.concat('results', 'accuracyResults.log'))
 logger:add{"EPOCH  TRAIN ACC  VAL ACC"}
 for i =1, opt.epochs do
       	print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> EPOCH " .. i .. " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<") 
@@ -291,3 +322,4 @@ for i =1, opt.epochs do
 	valAcc   = val()
 	logger:add{i .. "," .. trainAcc .. "," ..  valAcc}
 end
+--]]
