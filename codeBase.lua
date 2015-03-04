@@ -109,18 +109,18 @@ end
 for i = 1,testSize do
    testData.data[i]  = image.rgb2yuv(testData.data[i])
 end
-channels = {'y','u','v'}
+channelsYUV = {'y','u','v'}
 mean = {}
 std = {}
 
 -- normalize each channel globally
-for i,channel in ipairs(channels) do
+for i,channel in ipairs(channelsYUV) do
    mean[i] = trainData.data[{ {},i,{},{} }]:mean()
    std[i] = trainData.data[{ {},i,{},{} }]:std()
    trainData.data[{ {},i,{},{} }]:add(-mean[i])
    trainData.data[{ {},i,{},{} }]:div(std[i])
 end
-for i,channel in ipairs(channels) do
+for i,channel in ipairs(channelsYUV) do
 	-- Normalize val, test data, using the training means/stds
    valData.data[{ {},i,{},{} }]:add(-mean[i])
    valData.data[{ {},i,{},{} }]:div(std[i])
@@ -131,7 +131,7 @@ end
 neighborhood = image.gaussian1D(13)
 normalization = nn.SpatialContrastiveNormalization(1, neighborhood, 1):float()
 -- Normalize all channels locally:
-for c in ipairs(channels) do
+for c in ipairs(channelsYUV) do
    for i = 1,trainData:size() do
       trainData.data[{ i,{c},{},{} }] = normalization:forward(trainData.data[{ i,{c},{},{} }])
    end
@@ -144,7 +144,7 @@ for c in ipairs(channels) do
 end
 
 print '==> verify statistics'
-for i,channel in ipairs(channels) do
+for i,channel in ipairs(channelsYUV) do
    print('training data, '..channel..'-channel, mean: ' .. trainData.data[{ {},i }]:mean())
    print('training data, '..channel..'-channel, standard deviation: ' .. trainData.data[{ {},i }]:std())
    print('validation data, '..channel..'-channel, mean: ' .. valData.data[{ {},i }]:mean())
