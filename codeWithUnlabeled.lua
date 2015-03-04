@@ -154,11 +154,7 @@ for i,channel in ipairs(channelsYUV) do
 end
 
 function crop(src, x, y, len)
-    -- (x, y) bottom left corner
-    -- (x+len, y+len) top right corner
-    width = (#src)[2]
-    height = (#src)[3]
-    return image.scale(image.crop(src, x, y, x+len, y+len), width, height)
+    return image.crop(src, x, y, x+len, y+len)
 end
 
 ------------------------------- CREATE SURROGATE CLASS ---------------------------------
