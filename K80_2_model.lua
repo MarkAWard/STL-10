@@ -104,7 +104,14 @@ function evaluate( modelPath, dataset, writeToFile)
     	local trash, argmax = output:max(2)
     	no_wrong = no_wrong + torch.ne(argmax, targets):sum()
     	
-    	if writeToFile then f:write(t .. " , " .. argmax .. "\n") end
+    	if writeToFile then
+    		for idx = 1, opt.batchSize do
+    			f:write( t+idx .. " , " .. argmax[idx] .. "\n") 
+    		end
+    	end 
+    	
+	    	 
+	    	
     end
 	if writeToFile then f:close() end
     return no_wrong/(dataset:size())
