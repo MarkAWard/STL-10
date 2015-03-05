@@ -88,7 +88,7 @@ function evaluate( modelPath, dataset, writeToFile)
 	if writeToFile then
 	   local outputFile = paths.concat('results', 'output.csv')
 	   f = io.open(outputFile, "w")
-	   f:write("Id , Category\n")
+	   f:write("Id,Category\n")
 	end
 	
 	modelToEval:evaluate()
