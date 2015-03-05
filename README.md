@@ -11,7 +11,7 @@
 | Augment Training              | LEM           | 2         |         |
 | Parallel / Wide Net a la 98   | Elad           | 1        |         |
 | optimize optimization params   | LEM           | 2        |         |
-| new test error function   | Lefteris           | 1        |         |
+| new test error function   | Lefteris           | 0        | DONE        |
 | do proper cross validation   | LEM           | 2        |         |
 | Zero Padding   | Lefteris           | 1        |         |
 
