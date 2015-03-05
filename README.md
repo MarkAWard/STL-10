@@ -9,7 +9,9 @@
 | One file rule all             | LEM           | 2         |         |
 | Balance Labels                | Elad          | 2         |         |
 | Augment Training              | LEM           | 2         |         |
-| Parallel / Wide Net a la 98   | Elad           | 2         |         |
+| Parallel / Wide Net a la 98   | Elad           | 2        |         |
+| optimize optimization params   | LEM           | 2        |         |
+
 
 ### Notes
 1. currently for k80 files, *.dat must be in pwd  
