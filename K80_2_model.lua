@@ -106,7 +106,7 @@ function evaluate( modelPath, dataset, writeToFile)
     	
     	if writeToFile then
     		for idx = 1, opt.batchSize do
-    			f:write( t+idx .. " , " .. argmax[idx][1] .. "\n") 
+    			f:write( t+idx-1 .. " , " .. argmax[idx][1] .. "\n") 
     		end
     	end 
     	
