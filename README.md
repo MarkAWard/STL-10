@@ -12,7 +12,7 @@
 | Parallel / Wide Net a la 98   | Elad           | 1        |         |
 | optimize optimization params   | LEM           | 2        |         |
 | new test error function   | Lefteris           | 1        |         |
-
+| do proper cross validation   | LEM           | 2        |         |
 
 
 ### Notes
