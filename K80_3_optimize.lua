@@ -4,8 +4,8 @@ logger:add{"EPOCH  TRAIN ACC  VAL ACC"}
 
 
 for i =1, opt.epochs do
-      	print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> EPOCH " .. i .. " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<") 
+	print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> EPOCH " .. i .. " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<") 
 	trainAcc = train(i)
-	valAcc   = evaluade(valData)
+	valAcc   = evaluate(valData)
 	logger:add{i .. "," .. trainAcc .. "," ..  valAcc}
 end
