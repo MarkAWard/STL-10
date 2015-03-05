@@ -119,20 +119,19 @@ function train( epoch )
 end
 --------------------------------- END TRAIN FUNCTION --------------------------------
 
------------------------------------ VAL FUNCTION --------------------------------------
-function val()
+-------------------------------- EVALUATE FUNCTION --------------------------------------
+function evaluate( dataset )
    classes = {'1','2','3','4','5','6','7','8','9','0'}
    local confusion_val = optim.ConfusionMatrix(classes)
    model:evaluate()
-   for t = 1,valData:size() do
-      local input = valData.data[t]
+   for t = 1,dataset:size() do
+      local input = dataset.data[t]
       if opt.type == 'double' then input = input:double()
       elseif opt.type == 'cuda' then input = input:cuda() end
-      local target = valData.labels[t]
+      local target = dataset.labels[t]
       local pred = model:forward(input)
       confusion_val:add(pred, target)
    end
-   --print(confusion_val)
    return confusion_val.totalValid * 100
 end
 --------------------------------- END VAL FUNCTION --------------------------------
