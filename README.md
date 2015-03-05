@@ -1,20 +1,20 @@
+
 # STL-10
 
-## Tasks (wihtout priority)  
+### Tasks (without priority)  
+| Task                         | Owner         | Priority  | Status  |
+| ------------------------------| ------------- |-----------|---------|
+| Get a GPU job on the HPC      | Elad          | 2         |         |
+| K80 GPU                       | LEM           | 2         |  DONE   |
+| One file rule all             | LEM           | 2         |         |
+| Balance Labels                | Elad          | 2         |         |
+| Augment Training              | LEM           | 2         |         |
+| Parallel / Wide Net a la 98   | Elad           | 2         |         |
 
-1) Get a GPU job on the HPC  
-
-2) K80 GPU -DONE
-
-3) Only one file that executes other files with functions.
-
-4) look if the labels are balances and make them balanced
-
-4) augment the training, irrespective of 'unlabled'
-
-5) make the network parallel like in '98 piece
-
-## How to see the GPU's status
+### How to see the GPU's status
 nvidia-smi
 
-## How to git:
+### How to git:
+git status
+---
+---
