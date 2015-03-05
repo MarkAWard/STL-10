@@ -84,9 +84,10 @@ end
 -------------------------------- EVALUATE FUNCTION --------------------------------------
 function evaluate( modelPath, dataset, writeToFile)
 	modelToEval = torch.load(modelPath)
+	local f
 	if writeToFile then
 	   local outputFile = paths.concat('results', 'output.csv')
-	   local f = io.open(outputFile, "w")
+	   f = io.open(outputFile, "w")
 	   f:write("Id , Category\n")
 	end
 	
