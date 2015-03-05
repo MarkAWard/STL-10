@@ -11,6 +11,9 @@
 | Augment Training              | LEM           | 2         |         |
 | Parallel / Wide Net a la 98   | Elad           | 2         |         |
 
+### Notes
+1. currently for k80 files, *.dat must be in pwd
+2. 
 ### How to see the GPU's status
 nvidia-smi
 
