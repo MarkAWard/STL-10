@@ -13,6 +13,7 @@
 | optimize optimization params   | LEM           | 2        |         |
 | new test error function   | Lefteris           | 1        |         |
 | do proper cross validation   | LEM           | 2        |         |
+| Zero Padding   | Lefteris           | 1        |         |
 
 
 ### Notes
