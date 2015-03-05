@@ -4,8 +4,8 @@ if opt.type == 'cuda' then
    model:add(nn.ReLU())
    model:add(nn.SpatialMaxPooling(3,3,2,2))
    model:add(nn.Dropout(.5))
-   model:add(nn.Reshape(23*22*22))
-   model:add(nn.Linear(23*22*22, 50))
+   model:add(nn.Reshape(23*23*23))
+   model:add(nn.Linear(23*23*23, 50))
    model:add(nn.Linear(50,10))
    model:add(nn.LogSoftMax())
 else
