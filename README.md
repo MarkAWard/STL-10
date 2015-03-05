@@ -13,7 +13,7 @@
 | optimize optimization params   | LEM           | 2        |         |
 | new test error function   | Lefteris           | 0        | DONE        |
 | do proper cross validation   | LEM           | 2        |         |
-| Zero Padding   | Lefteris           | 1        |         |
+| Zero Padding   | Lefteris           | 1        | DONE      |
 | learning rate by epoch   | LEM           | 3        |         |
 
 
