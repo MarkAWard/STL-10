@@ -82,21 +82,31 @@ end
 --------------------------------- END TRAIN FUNCTION --------------------------------
 
 -------------------------------- EVALUATE FUNCTION --------------------------------------
-function evaluate( dataset )
-   model:evaluate()
-   no_wrong = 0
-   for t = 1,dataset:size(), opt.batchSize do
-      local inputs  = dataset.data[{{t, math.min(t+opt.batchSize-1, dataset:size())}}]
-      local targets = dataset.labels[{{t, math.min(t+opt.batchSize-1, dataset:size())}}]
-
-      if opt.type == 'cuda' then 
-      	inputs  = inputs:cuda() 
-      	targets = targets:cuda()
-      end
-      local output = model:forward(inputs)
-	  local trash, argmax = output:max(2)
-      no_wrong = no_wrong + torch.ne(argmax, targets):sum()
-   end
-   return no_wrong/(dataset:size())
+function evaluate( modelPath, dataset, writeToFile)
+	modelToEval = torch.load(modelPath)
+	if writeToFile then
+	   local outputFile = paths.concat('results', 'output.csv')
+	   local f = io.open(outputFile, "w")
+	   f:write("Id , Category\n")
+	end
+	
+	modelToEval:evaluate()
+	local no_wrong = 0
+	for t = 1,dataset:size(), opt.batchSize do
+		local inputs  = dataset.data[{{t, math.min(t+opt.batchSize-1, dataset:size())}}]
+		local targets = dataset.labels[{{t, math.min(t+opt.batchSize-1, dataset:size())}}]
+		if opt.type == 'cuda' then 
+			inputs  = inputs:cuda() 
+			targets = targets:cuda()
+    	end
+    	local output = modelToEval:forward(inputs)
+    	local trash, argmax = output:max(2)
+    	no_wrong = no_wrong + torch.ne(argmax, targets):sum()
+    	
+    	if writeToFile then f:write(t .. " , " .. argmax .. "\n") end
+    end
+	if writeToFile then f:close() end
+    return no_wrong/(dataset:size())
 end
 -------------------------------- END EVALUATE FUNCTION --------------------------------
+
