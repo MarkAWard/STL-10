@@ -32,9 +32,8 @@ end
 ----------------------------------- TRAIN FUNCTION --------------------------------------
 
 function train( epoch )
-	--classes = {'1','2','3','4','5','6','7','8','9','0'}
-	--local confusion = optim.ConfusionMatrix(classes)
-	
+	classes = {'1','2','3','4','5','6','7','8','9','0'}
+	local confusion = optim.ConfusionMatrix(classes)
 	model:training() -- set model to training mode (for modules that differ in training and testing, like Dropout)
 	-- Shuffling the training data   
 	shuffle = torch.randperm(trainData:size())
@@ -70,14 +69,14 @@ function train( epoch )
 		clr = opt.learningRate
 		parameters:add(-clr, gradParameters)
 		
-		-- argmax=argmax:reshape((#inputs)[1])
-		-- confusion:batchAdd(argmax, targets)
+		argmax=argmax:reshape((#inputs)[1])
+		confusion:batchAdd(argmax, targets)
    end
 
    local filename = paths.concat('results', 'model_' .. epoch .. '.net')
    os.execute('mkdir -p ' .. sys.dirname(filename))
    torch.save(filename, model)
-   --print(confusion) return confusion.totalValid*100
+   print(confusion)
    return no_wrong/(trainData:size())   
 end
 --------------------------------- END TRAIN FUNCTION --------------------------------
