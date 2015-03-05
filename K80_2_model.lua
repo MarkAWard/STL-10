@@ -28,16 +28,6 @@ if opt.type == 'cuda' then
 end
 
 
------------------------------------ OPTIMIZATION --------------------------------------
-
-optimState = {
-   learningRate = opt.learningRate,
-   weightDecay = opt.weightDecay,
-   momentum = opt.momentum,
-   learningRateDecay = opt.lrDecay
-}
-optimMethod = optim.sgd
-
 ----------------------------------- TRAIN FUNCTION --------------------------------------
 
 function train( epoch )
@@ -76,6 +66,13 @@ function train( epoch )
    for t = 1,trainData:size(),opt.batchSize do
 	  local inputs  = shuffed_tr_data[{{t, math.min(t+opt.batchSize-1, trainData:size())}}]
 	  local targets = shuffed_tr_targets[{{t, math.min(t+opt.batchSize-1, trainData:size())}}]
+	  
+	  if opt.type=='cuda' then 
+	  inputs=inputs:cuda()
+	  targets=targets:cuda()
+	  end
+	  
+	  
 	  gradParameters:zero()
 	  
 	  --print(torch.type(inputs))
@@ -115,7 +112,7 @@ function train( epoch )
    local filename = paths.concat('results', 'model_' .. epoch .. '.net')
    os.execute('mkdir -p ' .. sys.dirname(filename))
    torch.save(filename, model)
-   --print(confusion)
+   print(confusion)
    p=no_wrong/(trainData:size())
    print(p)
    return confusion.totalValid*100

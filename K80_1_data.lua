@@ -139,16 +139,16 @@ require 'cunn'
 cutorch.setDevice(3)
 cutorch.getDeviceProperties(cutorch.getDevice())
 
-trainData.data=trainData.data:cuda()
-trainData.labels=trainData.labels:cuda()
+trainData.data=trainData.data
+trainData.labels=trainData.labels
 
-valData.data=valData.data:cuda()
-valData.labels=valData.labels:cuda()
+valData.data=valData.data
+valData.labels=valData.labels
 
-testData.data=testData.data:cuda()
-testData.labels=testData.labels:cuda()
+testData.data=testData.data
+testData.labels=testData.labels
 
-torch.setdefaulttensortype('torch.CudaTensor')
+--torch.setdefaulttensortype('torch.CudaTensor')
 end
 
 
