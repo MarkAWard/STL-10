@@ -1,5 +1,11 @@
 ------------------------------- MAIN LEARNING FUNCTION ---------------------------------
-logger = optim.Logger(paths.concat('results', 'accuracyResults.log'))
+
+-- creating symbolik links in the execution directory
+os.execute('ln -s /tmp/elad/tr_bin.dat tr_bin.dat')
+os.execute('ln -s /tmp/elad/ts_bin.dat ts_bin.dat')
+os.execute('ln -s /tmp/elad/un_bin.dat un_bin.dat')
+
+logger = optim.Logger(paths.concat('results', 'errorResults.log'))
 logger:add{"EPOCH    TRAIN ERROR    VAL ERROR"}
 
 valErrorEpochPair = {1.1,-1}
