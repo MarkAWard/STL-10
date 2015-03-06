@@ -1,4 +1,6 @@
 if opt.type == 'cuda' then
+
+--[[
    model = nn.Sequential()
    model:add(nn.SpatialConvolutionMM(3, 23, 7, 7, 2, 2, 2))
    model:add(nn.ReLU())
@@ -8,6 +10,40 @@ if opt.type == 'cuda' then
    model:add(nn.Linear(23*23*23, 50))
    model:add(nn.Linear(50,10))
    model:add(nn.LogSoftMax())
+--]]   
+
+
+
+	upper_part=nn.Sequential()
+	upper_part:add(nn.SpatialConvolutionMM(3, 20, 7, 7, 2, 2, 2))
+	upper_part:add(nn.ReLU())
+	upper_part:add(nn.SpatialConvolutionMM(20, 30, 16, 16, 2, 2))
+	upper_part:add(nn.ReLU())
+	upper_part:add(nn.SpatialConvolutionMM(30, 30, 4, 4, 1, 1))
+	upper_part:add(nn.ReLU())
+
+	lower_part=nn.Sequential()
+	lower_part:add(nn.SpatialConvolutionMM(3, 20, 7, 7, 6, 6, 2))
+	lower_part:add(nn.ReLU())
+	lower_part:add(nn.SpatialConvolutionMM(20, 30, 4, 4, 1, 1))
+	lower_part:add(nn.ReLU())
+
+	par=nn.Concat(2)
+	par:add(upper_part)
+	par:add(lower_part)
+
+	model = nn.Sequential()
+	model:add(par)
+	model:add(nn.SpatialMaxPooling(4,4,2,2))
+	model:add(nn.Dropout(.5))
+	model:add(nn.Reshape(60*5*5))
+	model:add(nn.Linear(60*5*5, 60))
+	model:add(nn.Linear(60,10))
+	model:add(nn.LogSoftMax())
+
+		
+   
+   
 else
    -- the model is not the updated one we use when the CUDA flag is on
    model = nn.Sequential()
@@ -66,7 +102,10 @@ function train( epoch )
 	  	model:backward(inputs, criterion:backward(output, targets))
 
 		--clr = opt.learningRate * (0.5 ^ math.floor(epoch / opt.lrDecay))
+
 		clr = opt.learningRate
+		
+		
 		parameters:add(-clr, gradParameters)
 		
 		argmax=argmax:reshape((#inputs)[1])
@@ -76,7 +115,7 @@ function train( epoch )
    local filename = paths.concat('results', 'model_' .. epoch .. '.net')
    os.execute('mkdir -p ' .. sys.dirname(filename))
    torch.save(filename, model)
-   print(confusion)
+   --print(confusion)
    return no_wrong/(trainData:size())   
 end
 --------------------------------- END TRAIN FUNCTION --------------------------------

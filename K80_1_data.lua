@@ -15,7 +15,7 @@ cmd:option('-learningRate', 1e-3, 'learning rate at t=0')
 cmd:option('-lrDecay', .98, 'learning rate at t=0')
 cmd:option('-weightDecay', 0, 'weight decay (SGD only)')
 cmd:option('-momentum', 0, 'momentum (SGD only)')
-cmd:option('-epochs', 100, 'max number of epochs to run')
+cmd:option('-epochs', 400, 'max number of epochs to run')
 cmd:text()
 opt = cmd:parse(arg or {})
 
@@ -138,15 +138,6 @@ if opt.type=='cuda' then
 require 'cunn'
 cutorch.setDevice(3)
 cutorch.getDeviceProperties(cutorch.getDevice())
-
-trainData.data=trainData.data
-trainData.labels=trainData.labels
-
-valData.data=valData.data
-valData.labels=valData.labels
-
-testData.data=testData.data
-testData.labels=testData.labels
 
 --torch.setdefaulttensortype('torch.CudaTensor')
 end
