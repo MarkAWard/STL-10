@@ -1,13 +1,30 @@
+
 # STL-10
 
-Tasks (without priority)  
+### Tasks (without priority)  
+| Task                         | Owner         | Priority  | Status  |
+| ------------------------------| ------------- |-----------|---------|
+| Get a GPU job on the HPC      | Elad          | 2         |         |
+| K80 GPU                       | LEM           | 0         |  DONE   |
+| One file rule all             | LEM           | 2         |         |
+| Balance Labels                | Lefteris          | 0         | DONE        |
+| Augment Training              | LEM           | 2         |         |
+| Parallel / Wide Net a la 98   | Elad           | 1        |         |
+| optimize optimization params   | LEM           | 2        |         |
+| new test error function   | Lefteris           | 0        | DONE        |
+| do proper cross validation   | LEM           | 2        |         |
+| Zero Padding   | Lefteris           | 1        | DONE      |
+| learning rate by epoch   | LEM           | 3        |         |
 
-1) Get a GPU job on the HPC  
 
-2) Do it for K80  
 
-3) look if the labels are balances
+### Notes
+1. currently for k80 files, *.dat must be in pwd  
+  
+### How to see the GPU's status
+nvidia-smi
 
-4) augment the training
-
-5) make the network parallel like in '98 piece
+### How to git:
+git status
+---
+---
