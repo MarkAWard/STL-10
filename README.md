@@ -9,7 +9,7 @@
 | One file rule all             | LEM           | 2         |         |
 | Balance Labels                | Lefteris          | 0         | DONE        |
 | Augment Training              | LEM           | 2         |         |
-| Parallel / Wide Net a la 98   | Elad           | 1        |         |
+| Parallel / Wide Net a la 98   | Elad           | 0        | DONE        |
 | optimize optimization params   | LEM           | 2        |         |
 | new test error function   | Lefteris           | 0        | DONE        |
 | do proper cross validation   | LEM           | 2        |         |

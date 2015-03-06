@@ -4,6 +4,9 @@ require 'nn'      -- provides a normalization operator
 require 'xlua'    -- xlua provides useful tools, like progress bars
 require 'optim'   -- an optimization package, for online and batch methods
 require 'mattorch'
+
+local aug = require 'augmentations'
+
 -- The type is by default 'double' so I leave it like this now as we never changed it before
 -- When using CUDA
 --  changes:  require 'cunn', the model, the criterion, input = input:cuda()
@@ -153,13 +156,10 @@ for i,channel in ipairs(channelsYUV) do
    print('test data, '..channel..'-channel, standard deviation: ' .. testData.data[{ {},i }]:std())
 end
 
-function crop(src, x, y, len)
-    return image.crop(src, x, y, x+len, y+len)
-end
 
 ------------------------------- CREATE SURROGATE CLASS ---------------------------------
 
--- the new dataset is going to have dimensions C x N x (3x32x32)
+-- the new dataset is going to have dimensions (C * N) x 3 x 32 x 32
 -- C is the number of the initial images we selected that we will examine.
 -- N is the number of 32x32 patches we will extract from each image
 -- 3x32x32 is the effective part of the image we will perform augmentations on.
@@ -169,21 +169,19 @@ surrogateData   = torch.zeros( C*N, 3, 32, 32)
 surrogateLabels = torch.zeros( C*N )
 -- THE NUMBERS HAVE TO CHANGE, THEY WILL BE HUGE FOR THE UNLABELED DATASET
 
--- creating the labels: the first N entries have value 1, the second N ones 2 and so forth 
-for i =1, C do
-	for j=1,N do
-		surrogateLabels[ ((i-1)* N) + j ] =i -- the N patches come from the same surrogate class so we assign the same number to them
-	end
-end
 
 -- drawing the indexes of a random samples from the initial unlabeled data
 randomImageIndices = torch.randperm(valData:size())[ {{1,C}} ]
 sizeOfPatches = 32
 for i, imageIndex in pairs(randomImageIndices:totable()) do
-	for j = 1, N do
-		randX = math.random( imageHeight - sizeOfPatches )
-		randY = math.random( imageWidth - sizeOfPatches )
-		surrogateData[ (i-1)*N + j ] = crop( valData.data[imageIndex], randX, randY, 32)
+
+   randX = math.random( imageHeight - sizeOfPatches )
+   randY = math.random( imageWidth - sizeOfPatches )
+   local src = image.crop(valData.data[imageIndex], randX, randY, randX + sizeOfPatches, randY + sizeOfPatches)
+	
+   for j = 1, N do
+      surrogateLabels[ ((i-1)* N) + j ] = i
+		surrogateData[ (i-1)*N + j ] = aug.augment(src)
 	end
 end
 
