@@ -1,20 +1,24 @@
 -- data loading and preprocessing module
+require 'image'
 
 local D = {}
 
-function normalize_data(train, val, test)
+function D.normalize_data(train, val, test) 
 
+	train.data = train.data:float()
 	for i = 1, train:size() do
 		train.data[i] = image.rgb2yuv(train.data[i])
 	end
 
 	if val then
+		val.data = val.data:float()
 		for i = 1,val:size() do
 			val.data[i]	= image.rgb2yuv(val.data[i])
 		end
 	end
 
 	if test then
+		test.data = test.data:float()
 		for i = 1, test:size() do
 			test.data[i] = image.rgb2yuv(test.data[i])
 		end
@@ -43,7 +47,7 @@ function normalize_data(train, val, test)
 			end
 		end
 	end
-
+	
 	-- Normalize all three channels locally
 	neighborhood = image.gaussian1D(13)
 	normalization = nn.SpatialContrastiveNormalization(1, neighborhood, 1):float()

@@ -1,8 +1,9 @@
 -- data augmentation module
+require 'image'
 
-local M = {} --public interface
+local A = {} --public interface
 
-function M.translate(src, x, y)
+function A.translate(src, x, y)
     -- translate right x pixels  ~  math.random(-math.ceil((#src)[2] * .15), math.ceil((#src)[2] * .15))
     -- translate down y pixels   ~  math.random(-math.ceil((#src)[3] * .15), math.ceil((#src)[3] * .15))
     -- fill edges with the mirror of the image
@@ -34,7 +35,7 @@ function M.translate(src, x, y)
     return dest
 end
 
-function M.scale(src, x, y, len)
+function A.scale(src, x, y, len)
     -- (x, y) in [1, ceil((#src)[2] * .25)], [1, ceil((#src)[3] * .25)]
     -- (x+len, y+len) 
     
@@ -43,7 +44,7 @@ function M.scale(src, x, y, len)
     return image.scale(image.crop(src, x, y, x+len, y+len), width, height)
 end
 
-function M.rotation(src, deg) 
+function A.rotation(src, deg) 
     -- deg in [-20, 20] ~ (20. + 20.) * torch.rand(1)[1] - 20.
 
     local deg = deg * math.pi / 180.
@@ -70,19 +71,19 @@ function M.rotation(src, deg)
     
 end
 
-function M.contrast(src, p, m, c)
+function A.contrast(src, p, m, c)
     -- p in [.25, 4]  ~  (4 - .25) * torch.rand(1)[1] + .25
     -- m in [.7, 1.4] ~  (1.4 - .7) * torch.rand(1)[1] + 1.4
     -- c in [-.1, .1] ~  (.1 + .1) * torch.rand(1)[1] - .1
     -- I think the c range is a little extreme, avoid negative numbers
     
-    local dest = image.rgb2hsv(src)
+    local dest = image.yuv2hsv(src)
     dest[1] = torch.pow(dest[1], p) * m + c
     dest[2] = torch.pow(dest[2], p) * m + c
-    return image.hsv2rgb(dest)
+    return image.hsv2yuv(dest)
 end
 
-function M.color_change(src, val) 
+function A.color_change(src, val) 
     -- val in [-.1, .1]  ~  val = (.1 + .1) * torch.rand(1)[1] - .1
     
     local dest = image.rgb2hsv(src)
@@ -90,7 +91,7 @@ function M.color_change(src, val)
     return image.hsv2rgb(dest)
 end
 
-function M.augment(src)
+function A.augment(src)
 
     local dest = src
 
@@ -98,22 +99,22 @@ function M.augment(src)
     if torch.rand(1)[1] > 0.5 then
         local x = math.random(-math.ceil((#dest)[2] * .15), math.ceil((#dest)[2] * .15))
         local y = math.random(-math.ceil((#dest)[3] * .15), math.ceil((#dest)[3] * .15))
-        dest = M.translate(dest, x, y)
+        dest = A.translate(dest, x, y)
     end
 
     -- scale
     if torch.rand(1)[1] > 0.5 then
-        local x = math.random(1, math.ceil((#dest)[2] * .25))
-        local y = math.random(1, math.ceil((#dest)[3] * .25))
+        local x = math.random(1, math.ceil((#dest)[2] * .15))
+        local y = math.random(1, math.ceil((#dest)[3] * .15))
         local r = math.max(x, y)
         local len = math.random(math.floor(.8 * (#dest)[2]) - math.floor(.8 * r), (#dest)[2] - r)
-        dest = M.scale(dest, x, y, len)
+        dest = A.scale(dest, x, y, len)
     end
 
     -- rotate
     if torch.rand(1)[1] > 0.5 then
         local deg = (20. + 20.) * torch.rand(1)[1] - 20.
-        dest = M.rotation(dest, deg)
+        dest = A.rotation(dest, deg)
     end
 
     -- contrast
@@ -121,19 +122,19 @@ function M.augment(src)
         local p = (4 - .25) * torch.rand(1)[1] + .25
         local m = (1.4 - .7) * torch.rand(1)[1] + 1.4
         local c = (.1 + .1) * torch.rand(1)[1] - .1
-        dest = M.contrast(dest, p, m, c)
+        dest = A.contrast(dest, p, m, c)
     end
 
     -- color
     if torch.rand(1)[1] > 0.5 then
         local val = (.1 + .1) * torch.rand(1)[1] - .1
-        dest = M.color_change(dest, val)
+        dest = A.color_change(dest, val)
     end
 
     return dest
 end
 
-return M
+return A
 
 
 
