@@ -1,4 +1,5 @@
 -- data loading and preprocessing module
+require 'image'
 
 local D = {}
 
