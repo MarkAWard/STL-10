@@ -38,6 +38,7 @@ testFile = 'ts_bin.dat'
 --extraFile = 'un_bin.dat'
 
 loadedTrain=torch.load(trainFile)
+loadedTrain=torch.load(extraFile)
 -- loadedTest =torch.load(testFile)
 
 allTrainData=loadedTrain.x
@@ -104,7 +105,7 @@ for i, imageIndex in pairs(randomImageIndices:totable()) do
 		local randY = math.random( imageWidth - sizeOfPatches )
 		local src = image.crop(imageToAug, randX, randY, randX + sizeOfPatches, randY + sizeOfPatches)
 		for j = 1, N do
-			surrogateLabels[ idx ] = i
+			surrogateLabels[ idx ] = i -- (i-1)*K+k
 			surrogateData[ idx ]   = aug.augment(src)
 			idx = idx + 1
 		end
@@ -123,13 +124,13 @@ local surValLabels   = torch.zeros(surValSize)
 local surShuffleIndices = torch.randperm(surrogateSize)
 
 for i =1, surTrainSize do
-	trainData[i]   = allTrainData[ surShuffleIndices[i] ]
-	trainLabels[i] = allTrainLabels[ surShuffleIndices[i] ]
+	trainData[i]   = surrogateData[ surShuffleIndices[i] ]
+	trainLabels[i] = surrogateLabels[ surShuffleIndices[i] ]
 end
 -- and now populating the validation data.
 for i=1, surValSize do
-	valData[i]   = allTrainData[ surShuffleIndices[i+surTrainSize] ]
-	valLabels[i] = allTrainLabels[ surShuffleIndices[i+surTrainSize] ]
+	valData[i]   = surrogateData[ surShuffleIndices[i+surTrainSize] ]
+	valLabels[i] = surrogateLabels[ surShuffleIndices[i+surTrainSize] ]
 end
 
 trainData = {
