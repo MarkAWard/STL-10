@@ -169,6 +169,7 @@ print('==> setting model and criterion')
 model = mod.select_model(opt)
 criterion = mod.select_criterion(opt)
 
-
+print(model)
+print(criterion)
 
 
