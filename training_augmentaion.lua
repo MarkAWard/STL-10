@@ -63,6 +63,7 @@ trainFile = opt.train
 testFile = opt.test
 extraFile = opt.extra
 
+print('==> loading in data files')
 -- load in the data using the machine specific function
 local loader = torch.load
 if opt.machine == 'hpc' then
@@ -70,17 +71,21 @@ if opt.machine == 'hpc' then
 	loader = mattorch.load
 end
 if opt.trainSize ~= 0 then
+	print('    training data...')
 	loadedTrain = loader(trainFile)
 end
 if opt.testSize ~= 0 then
+	print('    test data...')
 	loadedTest = loader(testFile)
 end
 if opt.extraSize ~= 0 then
+	print('    extra data...')
 	loadedExtra = loader(extraFile)
 end
 
 -- machines load different formatted datasets
 -- $$$$$$$$$ TODO add in extra data $$$$$$$$$$$$$
+print('==> formatting data')
 if opt.machine == 'hpc' then
 	if opt.trainSize ~= 0 then
 		allTrainData   = loadedTrain.X:t():reshape(opt.trainSize + opt.valSize, channels, imageHeight, imageWidth)
@@ -122,8 +127,8 @@ for i =1, opt.trainSize do
 end
 -- and now populating the validation data.
 for i=1, opt.valSize do
-	valData[i]   = allTrainData[ shuffleIndices[i+trainSize] ]
-	valLabels[i] = allTrainLabels[ shuffleIndices[i+trainSize] ]
+	valData[i]   = allTrainData[ shuffleIndices[i+opt.trainSize] ]
+	valLabels[i] = allTrainLabels[ shuffleIndices[i+opt.trainSize] ]
 end
 
 -- create final data objects
@@ -154,6 +159,7 @@ local mean = {}
 local std = {}
 
 -- normalize data and convert to yuv format
+print('==> normalizing data')
 mean, std = data.normalize_data(trainData, valData, testData)
 
 print(mean)
