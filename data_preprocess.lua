@@ -5,6 +5,7 @@ local D = {}
 
 function D.normalize_data(train, val, test) 
 
+	print('    converting to yuv...')
 	train.data = train.data:float()
 	for i = 1, train:size() do
 		train.data[i] = image.rgb2yuv(train.data[i])
@@ -28,6 +29,7 @@ function D.normalize_data(train, val, test)
 	mean = {}
 	std = {}
 
+	print('    normalizing globally...')
 	-- normalize each channel globally
 	for i,channel in ipairs(channelsYUV) do
 		mean[i] = train.data[{ {},i,{},{} }]:mean()
@@ -48,6 +50,7 @@ function D.normalize_data(train, val, test)
 		end
 	end
 	
+	print('    normalizing locally...')
 	-- Normalize all three channels locally
 	neighborhood = image.gaussian1D(13)
 	normalization = nn.SpatialContrastiveNormalization(1, neighborhood, 1):float()
