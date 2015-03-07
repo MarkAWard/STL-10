@@ -76,6 +76,41 @@ testData = {
    size = function() return testSize end
 }
 
+------------------------------- CREATE SURROGATE CLASS ---------------------------------
+
+-- the new dataset is going to have dimensions (C * N) x 3 x 32 x 32
+-- C is the number of the initial images we selected that we will examine.
+-- N is the number of 32x32 patches we will extract from each image
+-- 3x32x32 is the effective part of the image we will perform augmentations on.
+C = 1000
+--N = math.random(5000, 32000) -- number of patches we are going to extract from an image
+N = 100
+surrogateData   = torch.zeros( C*N, 3, 32, 32)
+surrogateLabels = torch.zeros( C*N )
+-- The dataset I am creating will have 100000 training samples
+
+-- drawing the indexes of a random samples from the initial unlabeled data
+randomImageIndices = torch.randperm(valData:size())[ {{1,C}} ]
+sizeOfPatches = 32
+for i, imageIndex in pairs(randomImageIndices:totable()) do
+
+   randX = math.random( imageHeight - sizeOfPatches )
+   randY = math.random( imageWidth - sizeOfPatches )
+   local src = image.crop(valData.data[imageIndex], randX, randY, randX + sizeOfPatches, randY + sizeOfPatches)
+	
+   for j = 1, N do
+      surrogateLabels[ ((i-1)* N) + j ] = i
+      surrogateData[ (i-1)*N + j ] = aug.augment(src)
+	end
+end
+
+--------------------------------- NORMALIZE SURROGATE TRAINING DATA ----------------------
+
+
+
+
+
+
 --------------------------------- NORMALIZE DATA ---------------------------------------
 trainData.data = trainData.data:float()
 valData.data   = valData.data:float()
