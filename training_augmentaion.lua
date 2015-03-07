@@ -50,7 +50,11 @@ elseif opt.type == 'cuda' then
 	torch.setdefaulttensortype('torch.FloatTensor')
 	require 'cunn'
 	-- IS THIS ONLY FOR K80????
-	cutorch.setDevice(3)
+	if opt.machine == 'k80' then
+		cutorch.setDevice(3)
+	else
+		cutorch.setDevice(1)
+	end
 	cutorch.getDeviceProperties(cutorch.getDevice())
 end 
 
