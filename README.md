@@ -5,18 +5,16 @@
 | Task                         | Owner         | Priority  | Status  |
 | ------------------------------| ------------- |-----------|---------|
 | Get a GPU job on the HPC      | Elad          | 2         |         |
-| K80 GPU                       | LEM           | 0         |  DONE   |
 | One file rule all             | LEM           | 2         |         |
-| Balance Labels                | Lefteris          | 0         | DONE        |
 | Augment Training              | LEM           | 2         |         |
-| Parallel / Wide Net a la 98   | Elad           | 0        | DONE        |
 | optimize optimization params   | LEM           | 2        |         |
-| new test error function   | Lefteris           | 0        | DONE        |
 | do proper cross validation   | LEM           | 2        |         |
-| Zero Padding   | Lefteris           | 1        | DONE      |
 | learning rate by epoch   | LEM           | 3        |         |
-
-
+| K80 GPU                       | LEM           | 0         |  DONE   |
+| Zero Padding   | Lefteris           | 1        | DONE      |
+| new test error function   | Lefteris           | 0        | DONE        |
+| Balance Labels                | Lefteris          | 0         | DONE        |
+| Parallel / Wide Net a la 98   | Elad           | 0        | DONE        |
 
 ### Notes
 1. currently for k80 files, *.dat must be in pwd  
