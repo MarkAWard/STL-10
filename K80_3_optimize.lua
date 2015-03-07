@@ -12,6 +12,7 @@ valErrorEpochPair = {1.1,-1}
 for epoch =1, opt.epochs do
 	print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> EPOCH " .. epoch .. " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<") 
 	trainErr = train( epoch )
+	print(trainErr)
 	valErr   = evaluate( paths.concat('results','model_'.. epoch ..'.net'), valData, false)
 	if valErr < valErrorEpochPair[1] then
 		valErrorEpochPair[1] = valErr
