@@ -38,7 +38,8 @@ testFile = 'ts_bin.dat'
 --extraFile = 'un_bin.dat'
 
 loadedTrain=torch.load(trainFile)
-loadedTest =torch.load(testFile)
+loadedTrain=torch.load(extraFile)
+-- loadedTest =torch.load(testFile)
 
 allTrainData=loadedTrain.x
 allTrainLabels = loadedTrain.y
@@ -70,11 +71,13 @@ valData = {
    labels = valLabels,
    size = function() return valSize end
 }
+--[[
 testData = {
    data   = loadedTest.x,
    labels = loadedTest.y,
    size = function() return testSize end
 }
+--]]
 
 ------------------------------- CREATE SURROGATE CLASS ---------------------------------
 
@@ -82,36 +85,98 @@ testData = {
 -- C is the number of the initial images we selected that we will examine.
 -- N is the number of 32x32 patches we will extract from each image
 -- 3x32x32 is the effective part of the image we will perform augmentations on.
-C = 1000
---N = math.random(5000, 32000) -- number of patches we are going to extract from an image
-N = 100
-surrogateData   = torch.zeros( C*N, 3, 32, 32)
-surrogateLabels = torch.zeros( C*N )
--- The dataset I am creating will have 100000 training samples
+--C = 1000 -- number of images from unlabeled data
+local C = 50 -- ONLY FOR VAL DATASET
+local K = 1 -- number of patches from each image
+N = 200 -- number of augmentation for each patch
+sizeOfPatches = 32
+
+surrogateSize = C*K*N 
+surrogateData   = torch.zeros( surrogateSize, channels, sizeOfPatches, sizeOfPatches)
+surrogateLabels = torch.zeros( surrogateSize )
 
 -- drawing the indexes of a random samples from the initial unlabeled data
-randomImageIndices = torch.randperm(valData:size())[ {{1,C}} ]
-sizeOfPatches = 32
+local randomImageIndices = torch.randperm(valData:size())[ {{1,C}} ]
+local idx = 1
 for i, imageIndex in pairs(randomImageIndices:totable()) do
-
-   randX = math.random( imageHeight - sizeOfPatches )
-   randY = math.random( imageWidth - sizeOfPatches )
-   local src = image.crop(valData.data[imageIndex], randX, randY, randX + sizeOfPatches, randY + sizeOfPatches)
-	
-   for j = 1, N do
-      surrogateLabels[ ((i-1)* N) + j ] = i
-      surrogateData[ (i-1)*N + j ] = aug.augment(src)
+	local imageToAug = valData.data[imageIndex]
+	for k = 1, K do -- we will get 5 random patches from every image
+		local randX = math.random( imageHeight - sizeOfPatches )
+		local randY = math.random( imageWidth - sizeOfPatches )
+		local src = image.crop(imageToAug, randX, randY, randX + sizeOfPatches, randY + sizeOfPatches)
+		for j = 1, N do
+			surrogateLabels[ idx ] = i -- (i-1)*K+k
+			surrogateData[ idx ]   = aug.augment(src)
+			idx = idx + 1
+		end
 	end
 end
 
+local percentageForValidation = 10
+local startValSurrogate = surrogateSize - (C/percentageForValidation)*K*N 
+
+local surTrainSize   = startValSurrogate
+local surValSize     = surrogateSize - startValSurrogate
+local surTrainData   = torch.zeros(surTrainSize, channels, sizeOfPatches, sizeOfPatches)
+local surTrainLabels = torch.zeros(surTrainSize)
+local surValData     = torch.zeros(surValSize, channels, sizeOfPatches, sizeOfPatches)
+local surValLabels   = torch.zeros(surValSize)
+local surShuffleIndices = torch.randperm(surrogateSize)
+
+for i =1, surTrainSize do
+	trainData[i]   = surrogateData[ surShuffleIndices[i] ]
+	trainLabels[i] = surrogateLabels[ surShuffleIndices[i] ]
+end
+-- and now populating the validation data.
+for i=1, surValSize do
+	valData[i]   = surrogateData[ surShuffleIndices[i+surTrainSize] ]
+	valLabels[i] = surrogateLabels[ surShuffleIndices[i+surTrainSize] ]
+end
+
+trainData = {
+   data   = trainData,
+   labels = trainLabels,
+   size = function() return trainSize end
+}
+valData = {
+   data   = valData,
+   labels = valLabels,
+   size = function() return valSize end
+}
+
+
+
+
+
 --------------------------------- NORMALIZE SURROGATE TRAINING DATA ----------------------
 
+--[[surrogateData = surrogateData:float()
+for i = 1,surrogateSize do
+   surrogateData[i] = image.rgb2yuv(surrogateData[i])
+end
 
-
-
+channelsYUV = {'y','u','v'}
+mean = {}
+std = {}
+-- normalize each channel globally
+for i,channel in ipairs(channelsYUV) do
+   mean[i] = trainData.data[{ {},i,{},{} }]:mean()
+   std[i] = trainData.data[{ {},i,{},{} }]:std()
+   trainData.data[{ {},i,{},{} }]:add(-mean[i])
+   trainData.data[{ {},i,{},{} }]:div(std[i])
+end
+for i,channel in ipairs(channelsYUV) do
+	-- Normalize val, test data, using the training means/stds
+   valData.data[{ {},i,{},{} }]:add(-mean[i])
+   valData.data[{ {},i,{},{} }]:div(std[i])
+   testData.data[{ {},i,{},{} }]:add(-mean[i])
+   testData.data[{ {},i,{},{} }]:div(std[i])
+end
+--]]
 
 
 --------------------------------- NORMALIZE DATA ---------------------------------------
+--[[
 trainData.data = trainData.data:float()
 valData.data   = valData.data:float()
 testData.data  = testData.data:float()
@@ -167,7 +232,9 @@ for i,channel in ipairs(channelsYUV) do
    print('test data, '..channel..'-channel, mean: ' .. testData.data[{ {},i }]:mean())
    print('test data, '..channel..'-channel, standard deviation: ' .. testData.data[{ {},i }]:std())
 end
+--]]
 
+--[[ REMOVE THE COMMENTS
 if opt.type=='cuda' then
 
 require 'cunn'
@@ -176,6 +243,7 @@ cutorch.getDeviceProperties(cutorch.getDevice())
 
 --torch.setdefaulttensortype('torch.CudaTensor')
 end
+--]]
 
 
 
