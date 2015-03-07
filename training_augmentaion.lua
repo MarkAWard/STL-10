@@ -15,6 +15,9 @@ cmd:option('-seed', 1, 'fixed input seed for repeatable experiments')
 cmd:option('-threads', 8, 'number of threads')
 cmd:option('-type', 'double', 'type: double | float | cuda')
 
+cmd:option('-model', 'cuda', 'name of the model to use')
+
+cmd:option('-loss', 'nll', 'loss function to use')
 cmd:option('-batchSize', 32, 'mini-batch size (1 = pure stochastic)')
 cmd:option('-learningRate', 1e-3, 'learning rate at t=0')
 cmd:option('-lrDecay', 1e-7, 'learning rate at t=0')
@@ -162,9 +165,9 @@ local std = {}
 print('==> normalizing data')
 mean, std = data.normalize_data(trainData, valData, testData)
 
-print(mean)
-print(std)
-
+print('==> setting model and criterion')
+model = mod.select_model(opt)
+criterion = mod.select_criterion(opt)
 
 
 
