@@ -22,18 +22,18 @@
 ### How to see the GPU's status
 nvidia-smi
 
-### How to git:
-setup a repository:
-git clone <link>
+### How to git:  
+setup a repository:  
+git clone <link>  
 
-how to login:
-git config --global user.email <email>
-git config --gloabl user.name <name>
+how to login:  
+git config --global user.email <email>  
+git config --gloabl user.name <name>  
 
-how to commit:
-git add .
-git commit -m <msg>
-git push
+how to commit:  
+git add .  
+git commit -m <msg>  
+git push  
 
 ---
 ---
