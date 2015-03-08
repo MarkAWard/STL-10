@@ -80,7 +80,7 @@ function A.contrast(src, p, m, c)
     local dest = image.rgb2hsv(src)
     dest[1] = torch.pow(dest[1], p) * m + c
     dest[2] = torch.pow(dest[2], p) * m + c
-    return image.hsv2rbg(dest)
+    return image.hsv2rgb(dest)
 end
 
 function A.color_change(src, val) 
