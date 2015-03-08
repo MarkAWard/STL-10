@@ -119,8 +119,8 @@ for c in ipairs(channelsYUV) do
    end
 end
 -- Normalize all three channels locally
-neighborhood = image.gaussian1D(13)
-normalization = nn.SpatialContrastiveNormalization(1, neighborhood, 1):float()
+local neighborhood = image.gaussian1D(13)
+local normalization = nn.SpatialContrastiveNormalization(1, neighborhood, 1):float()
 -- Normalize all channels locally:
 for c in ipairs(channelsYUV) do
    for i = 1,trainData:size() do
