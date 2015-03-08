@@ -29,12 +29,12 @@ function patch_finder(x,w)
 	local x_grad=image.rgb2y(image.convolve(x, image.laplacian(8)))
 	x_grad=torch.abs(x_grad)
 	local output=model:forward(x_grad)
-	local max_val=torch.max(output)
+	max_val=torch.max(output)
 	
-	local tmp={}
+	tmp={}
 	for i=1, w do
 	    for j=1, w do
-			local holder=output[{{1},{i},{j}}]:reshape(1)
+			holder=output[{{1},{i},{j}}]:reshape(1)
 			if holder[1]==max_val then
 			    tmp={i,j} 
 			end
