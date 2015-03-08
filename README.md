@@ -30,7 +30,10 @@ how to login:
 git config --global user.email <email>
 git config --gloabl user.name <name>
 
+how to commit:
+git add .
+git commit -m <msg>
+git push
 
-git status
 ---
 ---
