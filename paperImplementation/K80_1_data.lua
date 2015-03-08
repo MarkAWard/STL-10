@@ -37,11 +37,11 @@ local surrogateSize = C*K*N
 local surrogateData   = torch.zeros( surrogateSize, channels, sizeOfPatches, sizeOfPatches)
 local surrogateLabels = torch.zeros( surrogateSize )
 -- drawing the indexes of a random samples from the initial unlabeled data
-local randomImageIndices = torch.randperm(valData:size())[ {{1,C}} ]
+local randomImageIndices = torch.randperm(unlabData:size())[ {{1,C}} ]
 local idx = 1
 for i, imageIndex in pairs(randomImageIndices:totable()) do
 	xlua.progress(i, C)
-	local imageToAug = valData.data[imageIndex]
+	local imageToAug = unlabData[imageIndex]
 	for k = 1, K do -- we will get 5 random patches from every image
 		local randX = math.random( imageHeight - sizeOfPatches )
 		local randY = math.random( imageWidth - sizeOfPatches )
