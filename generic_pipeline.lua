@@ -244,7 +244,6 @@ for epoch = 1, opt.epochs do
 	print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> EPOCH " .. epoch .. " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<") 
 
 	-- train model
-	print('going in: ' .. type(trainData.data))
 	trainErr = optimize.train( model, criterion, trainData, opt, epoch )
 	print(trainErr)
 

@@ -16,7 +16,6 @@ function F.train(model, criterion, trainData, options, epoch)
 		shuffed_tr_targets[t] = trainData.labels[shuffle[t]]
 	end
 	
-	print('before batch: ' .. type(shuffed_tr_data))	
 	-- batch training to exploit CUDA optimizations
 	parameters, gradParameters = model:getParameters()
 	local no_wrong=0
@@ -28,7 +27,6 @@ function F.train(model, criterion, trainData, options, epoch)
 			inputs  = inputs:cuda()
 			targets = targets:cuda()
 		end
-		print('batch: ' .. type(inputs))	
 		gradParameters:zero()
 		
 		-- forward and backward passes
