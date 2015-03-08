@@ -14,8 +14,8 @@ function patch_finder(x,w)
     
     --print(#output)
 
-	for i=1, w do
-	    for j=1, w do
+	for i=1, (#output)[2] do
+	    for j=1, (#output)[2] do
 		holder=output[{{1},{i},{j}}]:reshape(1)
 		if holder[1]==max_val then
 		    tmp={i,j} end
