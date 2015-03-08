@@ -40,9 +40,9 @@ function trainWithUnlabeledModel( epoch, unlaModelPath )
 		if opt.type == 'cuda' then 
 			inputs  = inputs:cuda() 
     	end
-    	local output = modelToEval:forward(inputs)
+		unlaModel:forward(inputs)
     	for idx = 1, opt.batchSize do
-	    	newInput[trainIdx] = modelToEval:get(5).output[idx]
+	    	newInput[trainIdx] = unlaModel:get(5).output[idx]
 	    	trainIdx = trainIdx+1
     	end
     end
