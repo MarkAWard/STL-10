@@ -197,6 +197,11 @@ print('==> setting model and criterion')
 model = mod.select_model(opt)
 criterion = crit.select_criterion(opt)
 
+if opt.type == 'cuda' then
+   model:cuda()
+   criterion:cuda()
+end
+
 print('Size of training data: ' .. trainData:size())
 print(model)
 print(criterion)
