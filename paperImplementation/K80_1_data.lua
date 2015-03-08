@@ -27,6 +27,8 @@ sizeOfPatches = 32
 local C = 50 -- number of the initial images we will examine.
 local K = 1  -- number of patches from each image
 local N = 200      -- number of augmentation for each patch
+imageHeight   = 96
+imageWidth    = 96
 
 local extraFile = 'un_bin.dat'
 local unlabData = torch.load(extraFile).x
