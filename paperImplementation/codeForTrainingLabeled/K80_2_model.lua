@@ -35,8 +35,8 @@ function trainWithUnlabeledModel( epoch, unlaModelPath )
 	
 	newInput = torch.zeros( trainData:size(), 23,7,7 )
 	trainIdx = 1
-	for t = 1,dataset:size(), opt.batchSize do
-		local inputs  = trainData.data[{{t, math.min(t+opt.batchSize-1, dataset:size())}}]
+	for t = 1,trainData:size(), opt.batchSize do
+		local inputs  = trainData.data[{{t, math.min(t+opt.batchSize-1, trainData:size())}}]
 		if opt.type == 'cuda' then 
 			inputs  = inputs:cuda() 
     	end
