@@ -60,12 +60,13 @@ testFile = 'ts_bin.dat'
 
 loadedTrain=torch.load(trainFile)
 loadedTest =torch.load(testFile)
+loadedTrain.x = loadedTrain.x:float()
+loadedTest.x  = loadedTest.x:float()
 
 allTrainData=loadedTrain.x
 allTrainLabels = loadedTrain.y
 
 shuffleIndices = torch.randperm(trainSize + valSize)
-
 trainData   = torch.zeros(trainSize, channels, imageHeight, imageWidth)
 trainLabels = torch.zeros(trainSize)
 valData     = torch.zeros(valSize, channels, imageHeight, imageWidth)
