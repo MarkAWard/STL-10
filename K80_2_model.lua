@@ -47,7 +47,7 @@ if opt.type == 'cuda' then
 else
    -- the model is not the updated one we use when the CUDA flag is on
    model = nn.Sequential()
-   model:add(nn.SpatialConvolution(3, 23, 7, 7, 2, 2))
+   model:add(nn.SpatialConvolutionMM(3, 23, 7, 7, 2, 2))
    model:add(nn.ReLU())
    model:add(nn.SpatialMaxPooling(3,3,2,2))
    model:add(nn.Dropout(.5))
