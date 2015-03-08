@@ -42,7 +42,7 @@ function trainWithUnlabeledModel( epoch, unlaModelPath )
     	end
 		unlaModel:forward(inputs)
     	for idx = 1, opt.batchSize do
-	    	newInput[trainIdx] = unlaModel:get(5).output[idx]
+	    	newInput[trainIdx] = unlaModel:get(5).output[idx]:float()
 	    	trainIdx = trainIdx+1
     	end
     end
