@@ -24,8 +24,11 @@ nvidia-smi
 
 ### How to git:
 setup a repository:
+git clone <link>
 
-
+how to login:
+git config --global user.email <email>
+git config --gloabl user.name <name>
 
 
 git status
