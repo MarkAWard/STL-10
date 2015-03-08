@@ -199,10 +199,15 @@ local std = {}
 
 -- normalize data and convert to yuv format
 print('==> normalizing data')
-if opt.warmStart ~= 'model_path' then
+if opt.warmStart == 'model_path' then
 	mean, std = data.normalize_data(trainData, valData, testData)
-	torch.save(paths.concat(opt.results, 'mean.values'), mean)
-	torch.save(paths.concat(opt.results, 'std.values'), std)
+
+	local filename = paths.concat(options.results, 'mean.values')
+	os.execute('mkdir -p ' .. sys.dirname(filename))
+	torch.save(filename, mean)
+
+	filename = paths.concat(options.results, 'std.values')
+	torch.save(filename, std)
 else
 	mean = torch.load(opt.mean)
 	std  = torch.load(opt.std)
@@ -212,7 +217,7 @@ else
 end
 
 print('==> setting model and criterion')
-if opt.warmStart ~= 'model_path' then
+if opt.warmStart == 'model_path' then
 	model = mod.select_model(opt)
 else
 	print('    loading model ' .. opt.warmStart)
