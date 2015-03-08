@@ -167,7 +167,7 @@ if opt.trainSize ~= 0 then
 	trainData = {
 	   data   = trainData,
 	   labels = trainLabels,
-	   size = function() return opt.trainSize end
+	   size = function() return number_of_images end
 	}
 end
 if opt.valSize ~= 0 then
