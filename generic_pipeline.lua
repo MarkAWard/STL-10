@@ -1,6 +1,7 @@
 require 'torch'       -- torch
 require 'image'       -- for color transforms
 require 'nn'          -- provides a normalization operator
+require 'optim'
 local data = require 'data_preprocess'
 local mod  = require 'model'
 local crit = require 'criterion'
