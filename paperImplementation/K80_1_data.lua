@@ -3,6 +3,7 @@ require 'image'   -- for color transforms
 require 'nn'      -- provides a normalization operator
 require 'xlua'    -- xlua provides useful tools, like progress bars
 require 'optim'   -- an optimization package, for online and batch methods
+local aug = require 'augmentations'
 
 cmd = torch.CmdLine()
 cmd:text()
@@ -26,7 +27,9 @@ local channels      = 3
 sizeOfPatches = 32
 local C = 50 -- number of the initial images we will examine.
 local K = 1  -- number of patches from each image
-N = 200      -- number of augmentation for each patch
+local N = 200      -- number of augmentation for each patch
+imageHeight   = 96
+imageWidth    = 96
 
 local extraFile = 'un_bin.dat'
 local unlabData = torch.load(extraFile).x
@@ -37,10 +40,9 @@ local surrogateSize = C*K*N
 local surrogateData   = torch.zeros( surrogateSize, channels, sizeOfPatches, sizeOfPatches)
 local surrogateLabels = torch.zeros( surrogateSize )
 -- drawing the indexes of a random samples from the initial unlabeled data
-local randomImageIndices = torch.randperm(unlabData:size())[ {{1,C}} ]
+local randomImageIndices = torch.randperm(unlabData:size()[1])[ {{1,C}} ]
 local idx = 1
 for i, imageIndex in pairs(randomImageIndices:totable()) do
-	xlua.progress(i, C)
 	local imageToAug = unlabData[imageIndex]
 	for k = 1, K do -- we will get 5 random patches from every image
 		local randX = math.random( imageHeight - sizeOfPatches )
