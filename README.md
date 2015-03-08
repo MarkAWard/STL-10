@@ -23,6 +23,11 @@
 nvidia-smi
 
 ### How to git:
+setup a repository:
+
+
+
+
 git status
 ---
 ---
