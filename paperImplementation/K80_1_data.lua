@@ -3,6 +3,7 @@ require 'image'   -- for color transforms
 require 'nn'      -- provides a normalization operator
 require 'xlua'    -- xlua provides useful tools, like progress bars
 require 'optim'   -- an optimization package, for online and batch methods
+local aug = require 'augmentations'
 
 cmd = torch.CmdLine()
 cmd:text()
