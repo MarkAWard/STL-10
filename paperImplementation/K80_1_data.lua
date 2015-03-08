@@ -24,7 +24,7 @@ torch.setdefaulttensortype('torch.FloatTensor')
 
 channels      = 3
 sizeOfPatches = 32
-C = 1 -- number of the initial images we will examine.
+C = 5000 -- number of the initial images we will examine.
 K = 1  -- number of patches from each image
 N = 200      -- number of augmentation for each patch
 imageHeight   = 96
