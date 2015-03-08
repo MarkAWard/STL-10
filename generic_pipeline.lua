@@ -199,7 +199,7 @@ local std = {}
 
 -- normalize data and convert to yuv format
 print('==> normalizing data')
-if opt.warmStart == 'model_path' then
+if opt.mean == 'mean_path' or opt.std == 'std_path' then
 	mean, std = data.normalize_data(trainData, valData, testData)
 
 	local filename = paths.concat(opt.results, 'mean.values')
@@ -244,6 +244,7 @@ for epoch = 1, opt.epochs do
 	print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> EPOCH " .. epoch .. " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<") 
 
 	-- train model
+	print('going in: ' .. type(trainData.data))
 	trainErr = optimize.train( model, criterion, trainData, opt, epoch )
 	print(trainErr)
 
