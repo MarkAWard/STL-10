@@ -14,6 +14,7 @@ cmd:text('Options:')
 cmd:option('-machine', 'k80', 'k80 or hpc')
 cmd:option('-seed', 1, 'fixed input seed for repeatable experiments')
 cmd:option('-threads', 8, 'number of threads')
+cmd:option('-device', 3, 'gpu device to use')
 cmd:option('-type', 'cuda', 'type: double | float | cuda')
 
 cmd:option('-model', 'cuda', 'name of the model to use')
@@ -44,6 +45,8 @@ cmd:option('-rotate', 0.5, 'probability for transformation')
 cmd:option('-contrast', 0.5, 'probability for transformation')
 cmd:option('-color', 0.5, 'probability for transformation')
 
+cmd:option('-results', 'results', 'name of directory to put results in')
+
 cmd:text()
 opt = cmd:parse(arg or {})
 
@@ -61,7 +64,7 @@ if opt.type == 'cuda' then
 	require 'cunn'
 	-- IS THIS ONLY FOR K80????
 	if opt.machine == 'k80' then
-		cutorch.setDevice(3)
+		cutorch.setDevice(opt.device)
 	else
 		cutorch.setDevice(1)
 	end
@@ -256,7 +259,7 @@ function train( epoch )
 		confusion:batchAdd(argmax, targets)
    end
 
-   local filename = paths.concat('results', 'model_' .. epoch .. '.net')
+   local filename = paths.concat(opt.results, 'model_' .. epoch .. '.net')
    os.execute('mkdir -p ' .. sys.dirname(filename))
    torch.save(filename, model)
    --print(confusion)
@@ -269,7 +272,7 @@ function evaluate( modelPath, dataset, writeToFile)
 	modelToEval = torch.load(modelPath)
 	local f
 	if writeToFile then
-	   local outputFile = paths.concat('results', 'output.csv')
+	   local outputFile = paths.concat(opt.results, 'output.csv')
 	   f = io.open(outputFile, "w")
 	   f:write("Id,Category\n")
 	end
@@ -301,7 +304,7 @@ end
 
 
 
-logger = optim.Logger(paths.concat('results', 'errorResults.log'))
+logger = optim.Logger(paths.concat(opt.results, 'errorResults.log'))
 logger:add{"EPOCH    TRAIN ERROR    VAL ERROR"}
 
 valErrorEpochPair = {1.1,-1}
@@ -318,5 +321,5 @@ for epoch =1, opt.epochs do
 end
 
 print("Now testing on model no. " .. valErrorEpochPair[2] .. " with validation error= " .. valErrorEpochPair[1])
-bestModelPath = paths.concat('results','model_'.. valErrorEpochPair[2] ..'.net')
+bestModelPath = paths.concat(opt.results,'model_'.. valErrorEpochPair[2] ..'.net')
 evaluate( bestModelPath, testData, true)
