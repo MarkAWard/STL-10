@@ -20,7 +20,6 @@ for epoch =1, opt.epochs do
 	end
 	logger:add{epoch .. "    " .. trainErr .. "    " ..  valErr}
 end
-
-print("Now testing on model no. " .. valErrorEpochPair[2] .. " with validation error= " .. valErrorEpochPair[1])
+--[[print("Now testing on model no. " .. valErrorEpochPair[2] .. " with validation error= " .. valErrorEpochPair[1])
 bestModelPath = paths.concat('results','model_'.. valErrorEpochPair[2] ..'.net')
-evaluate( bestModelPath, testData, true)
+evaluate( bestModelPath, testData, true) --]]

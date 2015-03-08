@@ -24,7 +24,7 @@ torch.setdefaulttensortype('torch.FloatTensor')
 
 channels      = 3
 sizeOfPatches = 32
-C = 50000 -- number of the initial images we will examine.
+C = 5000 -- number of the initial images we will examine.
 K = 1  -- number of patches from each image
 N = 200      -- number of augmentation for each patch
 imageHeight   = 96
@@ -52,7 +52,6 @@ for i, imageIndex in pairs(randomImageIndices:totable()) do
 		end
 	end
 end
-
 local percentageForValidation = 10
 local startValSurrogate = surrogateSize - (C/percentageForValidation)*K*N 
 
@@ -118,9 +117,6 @@ for c in ipairs(channelsYUV) do
    for i = 1,valData:size() do
       valData.data[{ i,{c},{},{} }] = normalization:forward(valData.data[{ i,{c},{},{} }])
    end
-   for i = 1,testData:size() do
-      testData.data[{ i,{c},{},{} }] = normalization:forward(testData.data[{ i,{c},{},{} }])
-   end
 end
 -- Normalize all three channels locally
 neighborhood = image.gaussian1D(13)
@@ -140,12 +136,7 @@ for i,channel in ipairs(channelsYUV) do
    print('training data, '..channel..'-channel, standard deviation: ' .. trainData.data[{ {},i }]:std())
    print('validation data, '..channel..'-channel, mean: ' .. valData.data[{ {},i }]:mean())
    print('validation data, '..channel..'-channel, standard deviation: ' .. valData.data[{ {},i }]:std())
-   print('test data, '..channel..'-channel, mean: ' .. testData.data[{ {},i }]:mean())
-   print('test data, '..channel..'-channel, standard deviation: ' .. testData.data[{ {},i }]:std())
 end
-
-
-
 
 if opt.type=='cuda' then
 require 'cunn'

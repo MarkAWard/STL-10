@@ -1,19 +1,13 @@
-if opt.type == 'cuda' then
-
+model = nn.Sequential()
+model:add(nn.SpatialConvolutionMM(3, 23, 7, 7, 2, 2, 2))
+model:add(nn.ReLU())
+model:add(nn.SpatialMaxPooling(3,3,2,2))
+model:add(nn.Dropout(.5))
+model:add(nn.Reshape(23*6*6))
+model:add(nn.Linear(23*6*6, 50))
+model:add(nn.Linear(50, C))
+model:add(nn.LogSoftMax())   
 --[[
-   model = nn.Sequential()
-   model:add(nn.SpatialConvolutionMM(3, 23, 7, 7, 2, 2, 2))
-   model:add(nn.ReLU())
-   model:add(nn.SpatialMaxPooling(3,3,2,2))
-   model:add(nn.Dropout(.5))
-   model:add(nn.Reshape(23*23*23))
-   model:add(nn.Linear(23*23*23, 50))
-   model:add(nn.Linear(50,10))
-   model:add(nn.LogSoftMax())
---]]   
-
-
-
 	upper_part=nn.Sequential()
 	upper_part:add(nn.SpatialConvolutionMM(3, 20, 7, 7, 2, 2, 2))
 	upper_part:add(nn.ReLU())
@@ -40,40 +34,19 @@ if opt.type == 'cuda' then
 	model:add(nn.Linear(60*5*5, 60))
 	model:add(nn.Linear(60,10))
 	model:add(nn.LogSoftMax())
-
-		
-   
-   
-else
-   -- the model is not the updated one we use when the CUDA flag is on
-   model = nn.Sequential()
-   model:add(nn.SpatialConvolution(3, 23, 7, 7, 2, 2))
-   model:add(nn.ReLU())
-   model:add(nn.SpatialMaxPooling(3,3,2,2))
-   model:add(nn.Dropout(.5))
-   model:add(nn.Reshape(23*22*22))
-   model:add(nn.Linear(23*22*22, 50))
-   model:add(nn.Linear(50,10))
-   model:add(nn.LogSoftMax())
-end
-
+	--]]
 criterion = nn.ClassNLLCriterion()
-
 if opt.type == 'cuda' then
    model:cuda()
    criterion:cuda()
 end
 
-
 ----------------------------------- TRAIN FUNCTION --------------------------------------
-
 function train( epoch )
-	classes = {'1','2','3','4','5','6','7','8','9','0'}
-	local confusion = optim.ConfusionMatrix(classes)
 	model:training() -- set model to training mode (for modules that differ in training and testing, like Dropout)
 	-- Shuffling the training data   
 	shuffle = torch.randperm(trainData:size())
-	shuffed_tr_data=torch.zeros(trainData:size(),channels,imageHeight,imageWidth)
+	shuffed_tr_data=torch.zeros(trainData:size(),channels,sizeOfPatches, sizeOfPatches)
 	shuffed_tr_targets=torch.zeros(trainData:size())	
 	for t = 1, trainData:size() do
 		shuffed_tr_data[t]=trainData.data[shuffle[t]]
@@ -92,7 +65,6 @@ function train( epoch )
 			targets=targets:cuda()
 		end
 		gradParameters:zero()
-		
 		local output = model:forward(inputs)
 		local f = criterion:forward(output, targets)
 		local trash, argmax = output:max(2)
@@ -100,16 +72,8 @@ function train( epoch )
 	  	
 	  	no_wrong = no_wrong + torch.ne(argmax, targets):sum()
 	  	model:backward(inputs, criterion:backward(output, targets))
-
-		--clr = opt.learningRate * (0.5 ^ math.floor(epoch / opt.lrDecay))
-
-		clr = opt.learningRate
-		
-		
+		clr = 1/(1 + 3^epoch/math.exp(epoch) )
 		parameters:add(-clr, gradParameters)
-		
-		argmax=argmax:reshape((#inputs)[1])
-		confusion:batchAdd(argmax, targets)
    end
 
    local filename = paths.concat('results', 'model_' .. epoch .. '.net')
@@ -148,9 +112,6 @@ function evaluate( modelPath, dataset, writeToFile)
     			f:write( t+idx-1 .. " , " .. argmax[idx][1] .. "\n") 
     		end
     	end 
-    	
-	    	 
-	    	
     end
 	if writeToFile then f:close() end
     return no_wrong/(dataset:size())
