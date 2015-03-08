@@ -77,10 +77,10 @@ function A.contrast(src, p, m, c)
     -- c in [-.1, .1] ~  (.1 + .1) * torch.rand(1)[1] - .1
     -- I think the c range is a little extreme, avoid negative numbers
     
-    local dest = image.yuv2hsv(src)
+    local dest = image.rgb2hsv(src)
     dest[1] = torch.pow(dest[1], p) * m + c
     dest[2] = torch.pow(dest[2], p) * m + c
-    return image.hsv2yuv(dest)
+    return image.hsv2rbg(dest)
 end
 
 function A.color_change(src, val) 
@@ -91,19 +91,23 @@ function A.color_change(src, val)
     return image.hsv2rgb(dest)
 end
 
-function A.augment(src)
+function A.augment(src, options)
 
     local dest = src
 
+    if torch.rand(1)[1] < options.flip then
+        dest = image.hflip(dest)
+    end
+
     -- translate
-    if torch.rand(1)[1] > 0.5 then
+    if torch.rand(1)[1] < options.translate then
         local x = math.random(-math.ceil((#dest)[2] * .15), math.ceil((#dest)[2] * .15))
         local y = math.random(-math.ceil((#dest)[3] * .15), math.ceil((#dest)[3] * .15))
         dest = A.translate(dest, x, y)
     end
 
     -- scale
-    if torch.rand(1)[1] > 0.5 then
+    if torch.rand(1)[1] < options.scale then
         local x = math.random(1, math.ceil((#dest)[2] * .15))
         local y = math.random(1, math.ceil((#dest)[3] * .15))
         local r = math.max(x, y)
@@ -112,13 +116,13 @@ function A.augment(src)
     end
 
     -- rotate
-    if torch.rand(1)[1] > 0.5 then
+    if torch.rand(1)[1] < options.rotate then
         local deg = (20. + 20.) * torch.rand(1)[1] - 20.
         dest = A.rotation(dest, deg)
     end
 
     -- contrast
-    if torch.rand(1)[1] > 0.5 then
+    if torch.rand(1)[1] < options.contrast then
         local p = (4 - .25) * torch.rand(1)[1] + .25
         local m = (1.4 - .7) * torch.rand(1)[1] + 1.4
         local c = (.1 + .1) * torch.rand(1)[1] - .1
@@ -126,7 +130,7 @@ function A.augment(src)
     end
 
     -- color
-    if torch.rand(1)[1] > 0.5 then
+    if torch.rand(1)[1] < options.color then
         local val = (.1 + .1) * torch.rand(1)[1] - .1
         dest = A.color_change(dest, val)
     end

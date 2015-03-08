@@ -34,6 +34,15 @@ cmd:option('-valSize', 500, 'validation set size')
 cmd:option('-testSize', 8000, 'testing set size')
 cmd:option('-extraSize', 0, 'extra data set size')
 
+cmd:option('-augment', true, 'augment and increase training dataset')
+cmd:option('-augSize', 200, 'number of new samples to create per image')
+cmd:option('-flip', 0.5, 'probability for transformation')
+cmd:option('-translate', 0.5, 'probability for transformation')
+cmd:option('-scale', 0.5, 'probability for transformation')
+cmd:option('-rotate', 0.5, 'probability for transformation')
+cmd:option('-contrast', 0.5, 'probability for transformation')
+cmd:option('-color', 0.5, 'probability for transformation')
+
 cmd:text()
 opt = cmd:parse(arg or {})
 
@@ -45,12 +54,9 @@ imageWidth = 96
 -- set environment and defaults
 torch.setnumthreads( opt.threads )
 torch.manualSeed( opt.seed )
-if opt.type == 'float' then
-	print('==> switching to floats')
-	torch.setdefaulttensortype('torch.FloatTensor')
-elseif opt.type == 'cuda' then
+torch.setdefaulttensortype('torch.FloatTensor')
+if opt.type == 'cuda' then
 	print('==> switching to CUDA')
-	torch.setdefaulttensortype('torch.FloatTensor')
 	require 'cunn'
 	-- IS THIS ONLY FOR K80????
 	if opt.machine == 'k80' then
@@ -114,7 +120,11 @@ end
 -- Defining the structures that will hold our data
 -- $$$$$$$$$ TODO add in extra data $$$$$$$$$$$$$
 if opt.trainSize ~= 0 then
-	trainData   = torch.zeros(opt.trainSize, channels, imageHeight, imageWidth)
+	if opt.augment then
+		number_of_images = opt.trainSize * (opt.augSize + 1)
+	else
+		number_of_images = opt.trainSize
+	trainData   = torch.zeros(number_of_images, channels, imageHeight, imageWidth)
 	trainLabels = torch.zeros(opt.trainSize)
 end
 if opt.valSize ~= 0 then
@@ -132,6 +142,22 @@ end
 for i=1, opt.valSize do
 	valData[i]   = allTrainData[ shuffleIndices[i+opt.trainSize] ]
 	valLabels[i] = allTrainLabels[ shuffleIndices[i+opt.trainSize] ]
+end
+
+-- create more data
+idx = 1
+if opt.augment then
+	-- iterate through each image
+	for i = 1, opt.trainSize do
+		local imageToAug = trainData[i]
+		local imageLabel = trainLabels[i]
+		-- perform augSize augmentations on each image
+		for j = 1, opt.augSize do
+			trainData[opt.trainSize + idx]   = aug.augment(imageToAug)
+			trainLabels[opt.trainSize + idx] = imageLabel
+			idx = idx + 1
+		end
+	end
 end
 
 -- create final data objects
@@ -169,6 +195,7 @@ print('==> setting model and criterion')
 model = mod.select_model(opt)
 criterion = crit.select_criterion(opt)
 
+print(trainData:size())
 print(model)
 print(criterion)
 
