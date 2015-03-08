@@ -21,6 +21,25 @@ opt = cmd:parse(arg or {})
 
 torch.setnumthreads( opt.threads )
 
+-- x is an image
+-- w is the window of the patch
+function patch_finder(x,w)
+	model=nn.SpatialAveragePooling(w,w,1,1)
+	--x=image.rotate(trainData.data[k],-1.5707963268)
+	x_grad=image.rgb2y(image.convolve(x, image.laplacian(8)))
+	x_grad=torch.abs(x_grad)
+	output=model:forward(x_grad)
+	max_val=torch.max(output)
+
+	for i=1, w do
+	    for j=1, w do
+		holder=output[{{1},{i},{j}}]:reshape(1)
+		if holder[1]==max_val then
+		    tmp={i,j} end
+		end
+	end
+	return(x[{{},{tmp[1],tmp[1]+w},{tmp[2],tmp[2]+w}}])
+end
 
 
 trainSize     = 4500
@@ -53,16 +72,16 @@ valLabels   = torch.zeros(valSize)
 testData     = torch.zeros(testSize, channels, imageHeight, imageWidth)
 
 for i =1, trainSize do
-	trainData[i]   = image.crop(allTrainData[ shuffleIndices[i] ], 30, 30, 30+imageHeight, 30+imageWidth)
+	trainData[i]   = patch_finder(allTrainData[ shuffleIndices[i] ], 32)
 	trainLabels[i] = allTrainLabels[ shuffleIndices[i] ]
 end
 -- and now populating the validation data.
 for i=1, valSize do
-	valData[i]   = image.crop(allTrainData[ shuffleIndices[i+trainSize] ], 30, 30, 30+imageHeight 30+imageWidth)
+	valData[i]   = patch_finder(allTrainData[ shuffleIndices[i+trainSize] ], 32)
 	valLabels[i] = allTrainLabels[ shuffleIndices[i+trainSize] ]
 end
 for i=1, testSize do
-	testData[i]   = image.crop(loadedTest.x[i], 30, 30, 30+imageHeight 30+imageWidth)
+	testData[i]   = patch_finder(loadedTest.x[i], 32)
 end
 
 trainData = {

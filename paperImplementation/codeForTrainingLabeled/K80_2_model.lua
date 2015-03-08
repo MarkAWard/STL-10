@@ -10,7 +10,14 @@ model:add(nn.Linear(23*7*7, 50))
 model:add(nn.Linear(50, C))
 model:add(nn.LogSoftMax()) 
 --]]  
-
+model = nn.Sequential()
+model:add(nn.SpatialConvolutionMM(23, 40, 3, 3, 1, 1))
+model:add(nn.ReLU())
+model:add(nn.SpatialMaxPooling(2,2,1,1))
+model:add(nn.Reshape(40*4*4))
+model:add(nn.Linear(40*4*4, 60))
+model:add(nn.Linear(60,10))
+model:add(nn.LogSoftMax()) 
 
 
 
