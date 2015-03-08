@@ -39,15 +39,15 @@ function M.select_model(options)
 	model:add(nn.LogSoftMax())
 	
 	else
-		model = nn.Sequential()
-		model:add(nn.SpatialConvolution(3, 23, 7, 7, 2, 2))
-		model:add(nn.ReLU())
-		model:add(nn.SpatialMaxPooling(3,3,2,2))
-		model:add(nn.Dropout(.5))
-		model:add(nn.Reshape(23*22*22))
-		model:add(nn.Linear(23*22*22, 50))
-		model:add(nn.Linear(50,10))
-		model:add(nn.LogSoftMax())
+	   model = nn.Sequential()
+	   model:add(nn.SpatialConvolution(3, 23, 7, 7, 2, 2))
+	   model:add(nn.ReLU())
+	   model:add(nn.SpatialMaxPooling(3,3,2,2))
+	   model:add(nn.Dropout(.5))
+	   model:add(nn.Reshape(23*22*22))
+	   model:add(nn.Linear(23*22*22, 50))
+	   model:add(nn.Linear(50,10))
+	   model:add(nn.LogSoftMax())
 	end
 
 	return model
