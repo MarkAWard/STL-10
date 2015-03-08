@@ -26,7 +26,7 @@ local channels      = 3
 sizeOfPatches = 32
 local C = 50 -- number of the initial images we will examine.
 local K = 1  -- number of patches from each image
-N = 200      -- number of augmentation for each patch
+local N = 200      -- number of augmentation for each patch
 
 local extraFile = 'un_bin.dat'
 local unlabData = torch.load(extraFile).x
@@ -40,7 +40,6 @@ local surrogateLabels = torch.zeros( surrogateSize )
 local randomImageIndices = torch.randperm(unlabData:size()[1])[ {{1,C}} ]
 local idx = 1
 for i, imageIndex in pairs(randomImageIndices:totable()) do
-	xlua.progress(i, C)
 	local imageToAug = unlabData[imageIndex]
 	for k = 1, K do -- we will get 5 random patches from every image
 		local randX = math.random( imageHeight - sizeOfPatches )
