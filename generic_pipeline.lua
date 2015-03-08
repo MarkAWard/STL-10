@@ -126,7 +126,7 @@ if opt.trainSize ~= 0 then
 		number_of_images = opt.trainSize
 	end
 	trainData   = torch.zeros(number_of_images, channels, imageHeight, imageWidth)
-	trainLabels = torch.zeros(opt.trainSize)
+	trainLabels = torch.zeros(number_of_images)
 end
 if opt.valSize ~= 0 then
 	valData     = torch.zeros(opt.valSize, channels, imageHeight, imageWidth)
@@ -146,6 +146,7 @@ for i=1, opt.valSize do
 end
 
 -- create more data
+print('==> creating augmented data')
 idx = 1
 if opt.augment then
 	-- iterate through each image
@@ -154,7 +155,7 @@ if opt.augment then
 		local imageLabel = trainLabels[i]
 		-- perform augSize augmentations on each image
 		for j = 1, opt.augSize do
-			trainData[opt.trainSize + idx]   = aug.augment(imageToAug)
+			trainData[opt.trainSize + idx]   = aug.augment(imageToAug, opt)
 			trainLabels[opt.trainSize + idx] = imageLabel
 			idx = idx + 1
 		end
