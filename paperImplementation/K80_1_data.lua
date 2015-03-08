@@ -140,6 +140,6 @@ end
 
 if opt.type=='cuda' then
 require 'cunn'
-cutorch.setDevice(3)
+cutorch.setDevice(4)
 cutorch.getDeviceProperties(cutorch.getDevice())
 end
