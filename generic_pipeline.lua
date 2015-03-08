@@ -202,11 +202,11 @@ print('==> normalizing data')
 if opt.warmStart == 'model_path' then
 	mean, std = data.normalize_data(trainData, valData, testData)
 
-	local filename = paths.concat(options.results, 'mean.values')
+	local filename = paths.concat(opt.results, 'mean.values')
 	os.execute('mkdir -p ' .. sys.dirname(filename))
 	torch.save(filename, mean)
 
-	filename = paths.concat(options.results, 'std.values')
+	filename = paths.concat(opt.results, 'std.values')
 	torch.save(filename, std)
 else
 	mean = torch.load(opt.mean)
