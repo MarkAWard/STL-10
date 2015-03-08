@@ -88,10 +88,10 @@ valData = {
 print '==> normalizing the data'
 trainData.data = trainData.data:float()
 valData.data   = valData.data:float()
-for i = 1,trainSize do
+for i = 1,surTrainSize do
    trainData.data[i] = image.rgb2yuv(trainData.data[i])
 end
-for i = 1,valSize do
+for i = 1,surValSize do
    valData.data[i]   = image.rgb2yuv(valData.data[i])
 end
 channelsYUV = {'y','u','v'}
