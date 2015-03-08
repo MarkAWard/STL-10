@@ -124,6 +124,7 @@ if opt.trainSize ~= 0 then
 		number_of_images = opt.trainSize * (opt.augSize + 1)
 	else
 		number_of_images = opt.trainSize
+	end
 	trainData   = torch.zeros(number_of_images, channels, imageHeight, imageWidth)
 	trainLabels = torch.zeros(opt.trainSize)
 end
