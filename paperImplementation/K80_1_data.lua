@@ -30,6 +30,8 @@ N = 200      -- number of augmentation for each patch
 
 local extraFile = 'un_bin.dat'
 local unlabData = torch.load(extraFile).x
+
+--[[
 ------------------------------- CREATE SURROGATE CLASS ---------------------------------
 local surrogateSize = C*K*N 
 local surrogateData   = torch.zeros( surrogateSize, channels, sizeOfPatches, sizeOfPatches)
@@ -186,4 +188,4 @@ end
 --]]
 
 
-
+--]]
