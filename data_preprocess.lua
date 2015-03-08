@@ -81,6 +81,7 @@ end
 
 function D.normalize(dataset, mean, std)
 
+	dataset.data = dataset.data:float()
 	for i = 1, dataset:size() do
 		dataset.data[i] = image.rgb2yuv(dataset.data[i])
 	end
