@@ -94,9 +94,9 @@ end
 for i = 1,surValSize do
    valData.data[i]   = image.rgb2yuv(valData.data[i])
 end
-channelsYUV = {'y','u','v'}
-mean = {}
-std = {}
+local channelsYUV = {'y','u','v'}
+local mean = {}
+local std = {}
 -- normalize each channel globally
 for i,channel in ipairs(channelsYUV) do
    mean[i] = trainData.data[{ {},i,{},{} }]:mean()
@@ -108,15 +108,6 @@ for i,channel in ipairs(channelsYUV) do
 	-- Normalize val, test data, using the training means/stds
    valData.data[{ {},i,{},{} }]:add(-mean[i])
    valData.data[{ {},i,{},{} }]:div(std[i])
-end
--- Normalize all three channels locally
-for c in ipairs(channelsYUV) do
-   for i = 1,trainData:size() do
-      trainData.data[{ i,{c},{},{} }] = normalization:forward(trainData.data[{ i,{c},{},{} }])
-   end
-   for i = 1,valData:size() do
-      valData.data[{ i,{c},{},{} }] = normalization:forward(valData.data[{ i,{c},{},{} }])
-   end
 end
 -- Normalize all three channels locally
 local neighborhood = image.gaussian1D(13)
