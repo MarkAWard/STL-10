@@ -59,7 +59,7 @@ function F.train(model, criterion, trainData, options, epoch)
 end
 
 
-function evaluate( modelPath, dataset, writeToFile, options)
+function F.evaluate( modelPath, dataset, writeToFile, options)
 	-- load the model
 	modelToEval = torch.load(modelPath)
 
