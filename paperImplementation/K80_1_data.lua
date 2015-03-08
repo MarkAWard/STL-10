@@ -18,88 +18,30 @@ cmd:option('-momentum', 0, 'momentum (SGD only)')
 cmd:option('-epochs', 400, 'max number of epochs to run')
 cmd:text()
 opt = cmd:parse(arg or {})
-
 torch.setnumthreads( opt.threads )
-
-
-
-trainSize     = 4500
-valSize       = 500
-testSize      = 8000
-extraSize     = 100000
-channels      = 3
-imageHeight   = 96
-imageWidth    = 96
-outputClasses = 10
-
 torch.setdefaulttensortype('torch.FloatTensor')
-trainFile = 'tr_bin.dat'
-testFile = 'ts_bin.dat'
---extraFile = 'un_bin.dat'
 
-loadedTrain=torch.load(trainFile)
-loadedTrain=torch.load(extraFile)
--- loadedTest =torch.load(testFile)
+--extraSize     = 100000
+local channels      = 3
+sizeOfPatches = 32
+local C = 50 -- number of the initial images we will examine.
+local K = 1  -- number of patches from each image
+N = 200      -- number of augmentation for each patch
 
-allTrainData=loadedTrain.x
-allTrainLabels = loadedTrain.y
+local extraFile = 'un_bin.dat'
+local unlabData = torch.load(extraFile).x
 
-shuffleIndices = torch.randperm(trainSize + valSize)
-
-trainData   = torch.zeros(trainSize, channels, imageHeight, imageWidth)
-trainLabels = torch.zeros(trainSize)
-valData     = torch.zeros(valSize, channels, imageHeight, imageWidth)
-valLabels   = torch.zeros(valSize)
-
-for i =1, trainSize do
-	trainData[i]   = allTrainData[ shuffleIndices[i] ]
-	trainLabels[i] = allTrainLabels[ shuffleIndices[i] ]
-end
--- and now populating the validation data.
-for i=1, valSize do
-	valData[i]   = allTrainData[ shuffleIndices[i+trainSize] ]
-	valLabels[i] = allTrainLabels[ shuffleIndices[i+trainSize] ]
-end
-
-trainData = {
-   data   = trainData,
-   labels = trainLabels,
-   size = function() return trainSize end
-}
-valData = {
-   data   = valData,
-   labels = valLabels,
-   size = function() return valSize end
-}
---[[
-testData = {
-   data   = loadedTest.x,
-   labels = loadedTest.y,
-   size = function() return testSize end
-}
---]]
 
 ------------------------------- CREATE SURROGATE CLASS ---------------------------------
-
--- the new dataset is going to have dimensions (C * N) x 3 x 32 x 32
--- C is the number of the initial images we selected that we will examine.
--- N is the number of 32x32 patches we will extract from each image
--- 3x32x32 is the effective part of the image we will perform augmentations on.
---C = 1000 -- number of images from unlabeled data
-local C = 50 -- ONLY FOR VAL DATASET
-local K = 1 -- number of patches from each image
-N = 200 -- number of augmentation for each patch
-sizeOfPatches = 32
-
-surrogateSize = C*K*N 
-surrogateData   = torch.zeros( surrogateSize, channels, sizeOfPatches, sizeOfPatches)
-surrogateLabels = torch.zeros( surrogateSize )
-
+local surrogateSize = C*K*N 
+local surrogateData   = torch.zeros( surrogateSize, channels, sizeOfPatches, sizeOfPatches)
+local surrogateLabels = torch.zeros( surrogateSize )
 -- drawing the indexes of a random samples from the initial unlabeled data
-local randomImageIndices = torch.randperm(valData:size())[ {{1,C}} ]
+local randomImageIndices = torch.randperm(unlabData:size())[ {{1,C}} ]
 local idx = 1
 for i, imageIndex in pairs(randomImageIndices:totable()) do
-	local imageToAug = valData.data[imageIndex]
+	xlua.progress(i, C)
+	local imageToAug = unlabData[imageIndex]
 	for k = 1, K do -- we will get 5 random patches from every image
 		local randX = math.random( imageHeight - sizeOfPatches )
 		local randY = math.random( imageWidth - sizeOfPatches )
@@ -112,36 +54,37 @@ for i, imageIndex in pairs(randomImageIndices:totable()) do
 	end
 end
 
+
 local percentageForValidation = 10
 local startValSurrogate = surrogateSize - (C/percentageForValidation)*K*N 
 
 local surTrainSize   = startValSurrogate
 local surValSize     = surrogateSize - startValSurrogate
+
+local surShuffleIndices = torch.randperm(surrogateSize)
 local surTrainData   = torch.zeros(surTrainSize, channels, sizeOfPatches, sizeOfPatches)
 local surTrainLabels = torch.zeros(surTrainSize)
 local surValData     = torch.zeros(surValSize, channels, sizeOfPatches, sizeOfPatches)
 local surValLabels   = torch.zeros(surValSize)
-local surShuffleIndices = torch.randperm(surrogateSize)
 
 for i =1, surTrainSize do
-	trainData[i]   = surrogateData[ surShuffleIndices[i] ]
-	trainLabels[i] = surrogateLabels[ surShuffleIndices[i] ]
+	surTrainData[i]   = surrogateData[ surShuffleIndices[i] ]
+	surTrainLabels[i] = surrogateLabels[ surShuffleIndices[i] ]
 end
--- and now populating the validation data.
 for i=1, surValSize do
-	valData[i]   = surrogateData[ surShuffleIndices[i+surTrainSize] ]
-	valLabels[i] = surrogateLabels[ surShuffleIndices[i+surTrainSize] ]
+	surValData[i]   = surrogateData[ surShuffleIndices[startValSurrogate + i] ]
+	surValLabels[i] = surrogateLabels[ surShuffleIndices[startValSurrogate + i] ]
 end
 
 trainData = {
-   data   = trainData,
-   labels = trainLabels,
-   size = function() return trainSize end
+   data   = surTrainData,
+   labels = surTrainLabels,
+   size = function() return surTrainSize end
 }
 valData = {
-   data   = valData,
-   labels = valLabels,
-   size = function() return valSize end
+   data   = surValData,
+   labels = surValLabels,
+   size = function() return surValSize end
 }
 
 
@@ -246,4 +189,4 @@ end
 --]]
 
 
-
+--]]
