@@ -6,6 +6,7 @@ local data = require 'data_preprocess'
 local mod  = require 'model'
 local crit = require 'criterion'
 local aug  = require 'augmentations'
+local optimize = require 'optimize'
 
 ------------------------------------ PARAMETERS ----------------------------------------
 cmd = torch.CmdLine()

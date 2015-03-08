@@ -38,7 +38,7 @@ function M.select_model(options)
 		model:add(nn.Linear(100,10))
 		model:add(nn.LogSoftMax())
 
-	if opt.model == 'deep' then
+	elseif opt.model == 'deep' then
 
 		model = nn.Sequential()
 
