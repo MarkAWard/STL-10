@@ -14,7 +14,7 @@ cmd:text('Options:')
 cmd:option('-machine', 'k80', 'k80 or hpc')
 cmd:option('-seed', 1, 'fixed input seed for repeatable experiments')
 cmd:option('-threads', 8, 'number of threads')
-cmd:option('-type', 'double', 'type: double | float | cuda')
+cmd:option('-type', 'cuda', 'type: double | float | cuda')
 
 cmd:option('-model', 'cuda', 'name of the model to use')
 
