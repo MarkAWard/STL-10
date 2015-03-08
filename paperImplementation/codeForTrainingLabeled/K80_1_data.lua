@@ -74,16 +74,16 @@ valLabels   = torch.zeros(valSize)
 testData     = torch.zeros(testSize, channels, imageHeight, imageWidth)
 
 for i =1, trainSize do
-	trainData[i]   = patch_finder(allTrainData[ shuffleIndices[i] ], 32)
+	trainData[i]   = patch_finder(allTrainData[ shuffleIndices[i] ], 31)
 	trainLabels[i] = allTrainLabels[ shuffleIndices[i] ]
 end
 -- and now populating the validation data.
 for i=1, valSize do
-	valData[i]   = patch_finder(allTrainData[ shuffleIndices[i+trainSize] ], 32)
+	valData[i]   = patch_finder(allTrainData[ shuffleIndices[i+trainSize] ], 31)
 	valLabels[i] = allTrainLabels[ shuffleIndices[i+trainSize] ]
 end
 for i=1, testSize do
-	testData[i]   = patch_finder(loadedTest.x[i], 32)
+	testData[i]   = patch_finder(loadedTest.x[i], 31)
 end
 
 trainData = {
