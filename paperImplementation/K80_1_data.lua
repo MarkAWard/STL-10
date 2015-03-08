@@ -24,7 +24,7 @@ torch.setdefaulttensortype('torch.FloatTensor')
 
 channels      = 3
 sizeOfPatches = 32
-C = 50 -- number of the initial images we will examine.
+C = 50000 -- number of the initial images we will examine.
 K = 1  -- number of patches from each image
 N = 200      -- number of augmentation for each patch
 imageHeight   = 96
@@ -86,6 +86,7 @@ valData = {
 }
 
 --------------------------------- NORMALIZE SURROGATE TRAINING DATA ----------------------
+print '==> normalizing the data'
 trainData.data = trainData.data:float()
 valData.data   = valData.data:float()
 for i = 1,trainSize do
