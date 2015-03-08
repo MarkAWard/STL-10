@@ -199,7 +199,7 @@ local std = {}
 
 -- normalize data and convert to yuv format
 print('==> normalizing data')
-if opt.warmStart == 'model_path' then
+if opt.mean == 'mean_path' or opt.std == 'std_path' then
 	mean, std = data.normalize_data(trainData, valData, testData)
 
 	local filename = paths.concat(opt.results, 'mean.values')
