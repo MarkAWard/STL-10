@@ -16,7 +16,7 @@ cmd:option('-learningRate', 1e-3, 'learning rate at t=0')
 cmd:option('-lrDecay', .98, 'learning rate at t=0')
 cmd:option('-weightDecay', 0, 'weight decay (SGD only)')
 cmd:option('-momentum', 0, 'momentum (SGD only)')
-cmd:option('-epochs', 200, 'max number of epochs to run')
+cmd:option('-epochs', 100, 'max number of epochs to run')
 cmd:text()
 opt = cmd:parse(arg or {})
 torch.setnumthreads( opt.threads )
@@ -34,7 +34,7 @@ surrogateSize = C*K*N
 local extraFile = 'un_bin.dat'
 local unlabData = torch.load(extraFile).x
 ------------------------------- CREATE SURROGATE CLASS ---------------------------------
-local surrogateData   = torch.zeros( surrogateSize, channels, sizeOfPatches, sizeOfPatches)
+local surrogateData   = torch.zeros( surrogateSize, channels, imageHeight, imageWidth)
 local surrogateLabels = torch.zeros( surrogateSize )
 -- drawing the indexes of a random samples from the initial unlabeled data
 local randomImageIndices = torch.randperm(unlabData:size()[1])[ {{1,C}} ]
@@ -42,9 +42,9 @@ local idx = 1
 for i, imageIndex in pairs(randomImageIndices:totable()) do
 	local imageToAug = unlabData[imageIndex]
 	for k = 1, K do -- we will get 5 random patches from every image
-		local randX = math.random( imageHeight - sizeOfPatches )
-		local randY = math.random( imageWidth - sizeOfPatches )
-		local src = image.crop(imageToAug, randX, randY, randX + sizeOfPatches, randY + sizeOfPatches)
+		--local randX = math.random( imageHeight - sizeOfPatches )
+		--local randY = math.random( imageWidth - sizeOfPatches )
+		local src = imageToAug--image.crop(imageToAug, randX, randY, randX + sizeOfPatches, randY + sizeOfPatches)
 		for j = 1, N do
 			surrogateLabels[ idx ] = i -- (i-1)*K+k
 			surrogateData[ idx ]   = aug.augment(src)
@@ -59,9 +59,9 @@ local surTrainSize   = startValSurrogate
 local surValSize     = surrogateSize - startValSurrogate
 
 local surShuffleIndices = torch.randperm(surrogateSize)
-local surTrainData   = torch.zeros(surTrainSize, channels, sizeOfPatches, sizeOfPatches)
+local surTrainData   = torch.zeros(surTrainSize, channels, imageHeight, imageWidth)
 local surTrainLabels = torch.zeros(surTrainSize)
-local surValData     = torch.zeros(surValSize, channels, sizeOfPatches, sizeOfPatches)
+local surValData     = torch.zeros(surValSize, channels, imageHeight, imageWidth)
 local surValLabels   = torch.zeros(surValSize)
 
 for i =1, surTrainSize do
