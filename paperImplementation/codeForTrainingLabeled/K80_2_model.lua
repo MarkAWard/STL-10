@@ -91,7 +91,7 @@ end
 --------------------------------- END TRAIN FUNCTION --------------------------------
 
 -------------------------------- EVALUATE FUNCTION --------------------------------------
-function evaluate( modelPath, dataset, writeToFile, unlaModelPath)
+function evaluateUnlabeledVersion( modelPath, dataset, writeToFile, unlaModelPath)
 	local f
 	if writeToFile then
 	   local outputFile = paths.concat('results', 'output.csv')
@@ -138,6 +138,38 @@ function evaluate( modelPath, dataset, writeToFile, unlaModelPath)
     		end
     	end 
     	 	
+    end
+	if writeToFile then f:close() end
+    return no_wrong/(dataset:size())
+end
+
+function evaluate( modelPath, dataset, writeToFile)
+	modelToEval = torch.load(modelPath)
+	local f
+	if writeToFile then
+	   local outputFile = paths.concat('results', 'output.csv')
+	   f = io.open(outputFile, "w")
+	   f:write("Id,Category\n")
+	end
+	
+	modelToEval:evaluate()
+	local no_wrong = 0
+	for t = 1,dataset:size(), opt.batchSize do
+		local inputs  = dataset.data[{{t, math.min(t+opt.batchSize-1, dataset:size())}}]
+		local targets = dataset.labels[{{t, math.min(t+opt.batchSize-1, dataset:size())}}]
+		if opt.type == 'cuda' then 
+			inputs  = inputs:cuda() 
+			targets = targets:cuda()
+    	end
+    	local output = modelToEval:forward(inputs)
+    	local trash, argmax = output:max(2)
+    	no_wrong = no_wrong + torch.ne(argmax, targets):sum()
+    	
+    	if writeToFile then
+    		for idx = 1, inputs:size()[1] do
+    			f:write( t+idx-1 .. " , " .. argmax[idx][1] .. "\n") 
+    		end
+    	end 
     end
 	if writeToFile then f:close() end
     return no_wrong/(dataset:size())
