@@ -51,7 +51,7 @@ function trainWithUnlabeledModel( epoch, unlaModelPath )
 	model:training() -- set model to training mode (for modules that differ in training and testing, like Dropout)
 	-- Shuffling the training data   
 	shuffle = torch.randperm(trainData:size())
-	shuffed_tr_data=torch.zeros(trainData:size(),C)
+	shuffed_tr_data=torch.zeros(trainData:size(), 23, 7, 7)
 	shuffed_tr_targets=torch.zeros(trainData:size())	
 	for t = 1, trainData:size() do
 		shuffed_tr_data[t]=newInput[shuffle[t]]
