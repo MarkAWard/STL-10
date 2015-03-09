@@ -14,7 +14,7 @@ for epoch =1, opt.epochs do
 	print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> EPOCH " .. epoch .. " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<") 
 	trainErr = trainWithUnlabeledModel( epoch, 'unlamodel.net' )
 	print(trainErr)
-	valErr   = evaluate( paths.concat('results','model_'.. epoch ..'.net'), valData, false)
+	valErr   = evaluate( paths.concat('results','model_'.. epoch ..'.net'), valData,  false, 'unlamodel.net')
 	if valErr < valErrorEpochPair[1] then
 		valErrorEpochPair[1] = valErr
 		valErrorEpochPair[2] = epoch
@@ -24,4 +24,4 @@ end
 
 print("Now testing on model no. " .. valErrorEpochPair[2] .. " with validation error= " .. valErrorEpochPair[1])
 bestModelPath = paths.concat('results','model_'.. valErrorEpochPair[2] ..'.net')
-evaluate( bestModelPath, testData, true)
+evaluate( bestModelPath, testData, true, 'unlamodel.net')
