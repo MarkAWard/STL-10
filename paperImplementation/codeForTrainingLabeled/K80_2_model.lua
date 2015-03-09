@@ -37,11 +37,12 @@ function trainWithUnlabeledModel( epoch, unlaModelPath )
 	trainIdx = 1
 	for t = 1,trainData:size(), opt.batchSize do
 		local inputs  = trainData.data[{{t, math.min(t+opt.batchSize-1, trainData:size())}}]
+		local sizeBatchSample = inputs:size()[1]
 		if opt.type == 'cuda' then 
 			inputs  = inputs:cuda() 
     	end
 		unlaModel:forward(inputs)
-    	for idx = 1, opt.batchSize do
+    	for idx = 1, sizeBatchSample do
 	    	newInput[trainIdx] = unlaModel:get(5).output[idx]:float()
 	    	trainIdx = trainIdx+1
     	end
@@ -103,6 +104,7 @@ function evaluate( modelPath, dataset, writeToFile)
 	local no_wrong = 0
 	for t = 1,dataset:size(), opt.batchSize do
 		local inputs  = dataset.data[{{t, math.min(t+opt.batchSize-1, dataset:size())}}]
+		local sizeBatchSample = inputs:size()[1]
 		local targets = dataset.labels[{{t, math.min(t+opt.batchSize-1, dataset:size())}}]
 		if opt.type == 'cuda' then 
 			inputs  = inputs:cuda() 
@@ -113,7 +115,7 @@ function evaluate( modelPath, dataset, writeToFile)
     	no_wrong = no_wrong + torch.ne(argmax, targets):sum()
     	
     	if writeToFile then
-    		for idx = 1, opt.batchSize do
+    		for idx = 1, sizeBatchSample do
     			f:write( t+idx-1 .. " , " .. argmax[idx][1] .. "\n") 
     		end
     	end 
