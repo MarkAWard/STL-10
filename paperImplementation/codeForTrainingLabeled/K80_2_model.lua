@@ -78,7 +78,7 @@ function trainWithUnlabeledModel( epoch, unlaModelPath )
 	  	no_wrong = no_wrong + torch.ne(argmax, targets):sum()
 	  	model:backward(inputs, criterion:backward(output, targets))
 		--clr = opt.learningRate * (0.5 ^ math.floor(epoch / opt.lrDecay))
-		clr = 1/(1 + 3^epoch/math.exp(epoch) )
+		--clr = 1/(1 + 3^epoch/math.exp(epoch) )
 		parameters:add(-clr, gradParameters)
    end
 
