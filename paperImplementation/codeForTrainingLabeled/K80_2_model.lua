@@ -111,7 +111,7 @@ function evaluateUnlabeledVersion( modelPath, dataset, writeToFile, unlaModelPat
 		if opt.type == 'cuda' then 
 			inputs  = inputs:cuda() 
     	end
-		unlaModel:forward(inputs)
+		unlModel:forward(inputs)
     	for idx = 1, sizeBatchSample do
 	    	newinp[evalIdx] = unlModel:get(5).output[idx]:float()
 	    	evalIdx = evalIdx+1
