@@ -24,20 +24,18 @@ torch.setnumthreads( opt.threads )
 -- x is an image
 -- w is the window of the patch
 function patch_finder(x,w)
-	local model=nn.SpatialAveragePooling(w,w,1,1)
+	model=nn.SpatialAveragePooling(w,w,1,1)
 	--x=image.rotate(trainData.data[k],-1.5707963268)
-	local x_grad=image.rgb2y(image.convolve(x, image.laplacian(8)))
+	x_grad=image.rgb2y(image.convolve(x, image.laplacian(8)))
 	x_grad=torch.abs(x_grad)
-	local output=model:forward(x_grad)
+	 
+	output=model:forward(x_grad)
 	max_val=torch.max(output)
-	
-	tmp={}
-	for i=1, w do
-	    for j=1, w do
-			holder=output[{{1},{i},{j}}]:reshape(1)
-			if holder[1]==max_val then
-			    tmp={i,j} 
-			end
+	for i=1, (#output)[2] do
+	    for j=1, (#output)[2] do
+		holder=output[{{1},{i},{j}}]:reshape(1)
+		if holder[1]==max_val then
+		    tmp={i,j} end
 		end
 	end
 	return(x[{{},{tmp[1],tmp[1]+w},{tmp[2],tmp[2]+w}}])
@@ -75,19 +73,19 @@ valLabels   = torch.zeros(valSize)
 testData     = torch.zeros(testSize, channels, imageHeight, imageWidth)
 
 for i =1, trainSize do
-	-- trainData[i]   = patch_finder(allTrainData[ shuffleIndices[i] ], 31)
-	trainData[i]   = image.crop(allTrainData[ shuffleIndices[i] ], 0,0,32,32)
+	trainData[i]   = patch_finder(allTrainData[ shuffleIndices[i] ], 31)
+	--trainData[i]   = image.crop(allTrainData[ shuffleIndices[i] ], 0,0,32,32)
 	trainLabels[i] = allTrainLabels[ shuffleIndices[i] ]
 end
 -- and now populating the validation data.
 for i=1, valSize do
-	-- valData[i]   = patch_finder(allTrainData[ shuffleIndices[i+trainSize] ], 31)
-	valData[i]   = image.crop(allTrainData[ shuffleIndices[i+trainSize] ], 0,0,32,32)
+	valData[i]   = patch_finder(allTrainData[ shuffleIndices[i+trainSize] ], 31)
+	--valData[i]   = image.crop(allTrainData[ shuffleIndices[i+trainSize] ], 0,0,32,32)
 	valLabels[i] = allTrainLabels[ shuffleIndices[i+trainSize] ]
 end
 for i=1, testSize do
-	--testData[i]   = patch_finder(loadedTest.x[i], 31)
-	testData[i]   = image.crop(loadedTest.x[i], 0,0,32,32)
+	testData[i]   = patch_finder(loadedTest.x[i], 31)
+	--testData[i]   = image.crop(loadedTest.x[i], 0,0,32,32)
 end
 
 trainData = {
