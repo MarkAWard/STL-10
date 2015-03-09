@@ -9,10 +9,10 @@ logger = optim.Logger(paths.concat('results', 'errorResults.log'))
 logger:add{"EPOCH    TRAIN ERROR    VAL ERROR"}
 
 valErrorEpochPair = {1.1,-1}
-unlabeledModel = paths.concat('unlamodel.net')
+--unlabeledModel = paths.concat('unlamodel.net')
 for epoch =1, opt.epochs do
 	print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>> EPOCH " .. epoch .. " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<") 
-	trainErr = trainWithUnlabeledModel( epoch, unlabeledModel )
+	trainErr = trainWithUnlabeledModel( epoch, 'unlamodel.net' )
 	print(trainErr)
 	valErr   = evaluate( paths.concat('results','model_'.. epoch ..'.net'), valData, false)
 	if valErr < valErrorEpochPair[1] then
