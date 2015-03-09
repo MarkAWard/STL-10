@@ -91,8 +91,7 @@ end
 --------------------------------- END TRAIN FUNCTION --------------------------------
 
 -------------------------------- EVALUATE FUNCTION --------------------------------------
-function evaluate( modelPath, dataset, writeToFile)
-	modelToEval = torch.load(modelPath)
+function evaluate( modelPath, dataset, writeToFile, unlaModelPath)
 	local f
 	if writeToFile then
 	   local outputFile = paths.concat('results', 'output.csv')
@@ -100,10 +99,29 @@ function evaluate( modelPath, dataset, writeToFile)
 	   f:write("Id,Category\n")
 	end
 	
+	local modelToEval = torch.load(modelPath)
+	local unlModel = torch.load(unlaModelPath)
+	local unlModel:evaluate()
+	
+	newinp = torch.zeros( dataset:size(), 23,7,7 )
+	evalIdx = 1
+	for t = 1,dataset:size(), opt.batchSize do
+		local inputs  = dataset.data[{{t, math.min(t+opt.batchSize-1, dataset:size())}}]
+		local sizeBatchSample = inputs:size()[1]
+		if opt.type == 'cuda' then 
+			inputs  = inputs:cuda() 
+    	end
+		unlaModel:forward(inputs)
+    	for idx = 1, sizeBatchSample do
+	    	newinp[evalIdx] = unlModel:get(5).output[idx]:float()
+	    	evalIdx = evalIdx+1
+    	end
+    end
+	
 	modelToEval:evaluate()
 	local no_wrong = 0
 	for t = 1,dataset:size(), opt.batchSize do
-		local inputs  = dataset.data[{{t, math.min(t+opt.batchSize-1, dataset:size())}}]
+		local inputs  = newinp[{{t, math.min(t+opt.batchSize-1, dataset:size())}}]
 		local sizeBatchSample = inputs:size()[1]
 		local targets = dataset.labels[{{t, math.min(t+opt.batchSize-1, dataset:size())}}]
 		if opt.type == 'cuda' then 
@@ -119,9 +137,7 @@ function evaluate( modelPath, dataset, writeToFile)
     			f:write( t+idx-1 .. " , " .. argmax[idx][1] .. "\n") 
     		end
     	end 
-    	
-	    	 
-	    	
+    	 	
     end
 	if writeToFile then f:close() end
     return no_wrong/(dataset:size())
