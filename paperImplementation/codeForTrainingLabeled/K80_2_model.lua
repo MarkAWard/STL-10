@@ -101,7 +101,7 @@ function evaluate( modelPath, dataset, writeToFile, unlaModelPath)
 	
 	local modelToEval = torch.load(modelPath)
 	local unlModel = torch.load(unlaModelPath)
-	local unlModel:evaluate()
+	unlModel:evaluate()
 	
 	newinp = torch.zeros( dataset:size(), 23,7,7 )
 	evalIdx = 1
