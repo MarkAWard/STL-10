@@ -218,12 +218,12 @@ end
 
 print('==> setting model and criterion')
 if opt.warmStart == 'model_path' then
-	model = mod.select_model(opt)
+	local model = mod.select_model(opt)
 else
 	print('    loading model ' .. opt.warmStart)
-	model = torch.load(opt.warmStart)
+	local model = torch.load(opt.warmStart)
 end
-criterion = crit.select_criterion(opt)
+local criterion = crit.select_criterion(opt)
 
 if opt.type == 'cuda' then
    model:cuda()
